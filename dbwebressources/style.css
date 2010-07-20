@@ -1,0 +1,214 @@
+.combobox {
+	background: white url('combo.gif')
+	no-repeat top right;
+}
+
+div.menu {
+	position: absolute;
+	top: 0;
+	left: 0;
+	font-family: verdana;
+}
+div.menu a {
+	display: block;
+	text-decoration: none;
+	cursor: default;
+	outline: none;
+	font-size: 11px;
+}
+.menu .separator {
+	height: 1px;
+	padding: 0;
+	overflow: hidden;
+	display: block;
+	font-size: 1px;
+}
+.menu ul, .menu li {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+.menu li {
+	list-style-position: outside;
+}
+.menu.desktop {
+	width: 14em;
+	background: #f9f8f7;
+	border: 1px solid #999;
+	padding: 0;
+}
+.menu.desktop ul, .menu.desktop li {
+	margin: 0;
+	padding: 0;
+}
+.menu.desktop li.separator {
+	height: 1px;
+}
+.menu.desktop a {
+	color: #555;
+	padding: 3px 0 3px 25px;
+	margin: 0;
+	border: 1px solid #f9f8f7;
+}
+.menu.desktop a.disabled {
+	opacity: 0.25;
+	filter: alpha(opacity=25);
+	zoom: 1;
+}
+.menu.desktop li.separator {
+	border-bottom: 1px solid #fff;
+	background: #aaa;
+	margin: 1px 1px 0 1px;
+	line-height: 1px !important;
+}
+
+/* we need explicit enabled class to overcome css deficiences (without creating unnecessary markup) */
+.menu.desktop a.enabled:hover {
+	background-color: #0A246A;
+	color: #fff;
+}
+
+div.autocomplete {	position:absolute;	width:250px;	background-color:white;	border:1px solid #888;	margin:0px;	padding:0px;}div.autocomplete ul {	list-style-type: none;	margin:0px;	padding:0px;	overflow:visible;
+	font-size:75%;
+}div.autocomplete ul li.selected { background-color: #ffb;}div.autocomplete ul li {	list-style-type: none;	display:block;	margin:0;	padding:2px;}
+
+
+.controlicon {
+	width: 16px;
+	height: 16px;
+	float: right;
+	position: relative;
+}
+.datatable {
+	font-size: 75%;
+	border: 1px solid #82A6B2;
+}
+.selectedRow {
+	background-color: #C5DAE5;
+	margin: 4px;
+	border: 1px dotted #303030;
+	-moz-border-radius: 3px;
+	-webkit-border-radius: 3px;
+}
+
+.datatable th {
+	color: #303030;
+	font-weight: bold;
+	background-color: #E6ECEC;
+}
+.datatable td {
+	background-color: #E6ECEC;
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
+}
+.datatable caption {
+	padding: 4px;
+	margin: 0px;
+	font-weight: bold;
+	color: #ffffff;
+	background-color: #82A6B2;
+	background: -webkit-gradient(linear, left top, left 25, from(#82A6B2), color-stop(3%, #C5D5D5), to(#80A4B0));
+	box-shadow: rgba(0,0,0, 0.1) 0px 0px 8px;
+	-moz-box-shadow: rgba(0,0,0, 0.1) 0px 0px 8px;
+	-webkit-box-shadow: rgba(0,0,0, 0.1) 0px 0px 8px;
+}
+
+.datatable a {
+	color: #303030;
+	text-decoration: none;
+	padding: 0;
+	margin: 0;
+}
+
+.datatable .insertvar {
+	background-color: #c4ffbe;
+}
+
+form {
+	padding: 1;
+    margin:0px;
+}
+
+fieldset {
+	background-color: #E6ECEC;
+	padding: 12px;
+    margin:0px;
+	position: relative;
+	border:none;
+	box-shadow: rgba(0,0,0, 0.1) 0px 0px 8px;
+	-moz-box-shadow: rgba(0,0,0, 0.1) 0px 0px 8px;
+	-webkit-box-shadow: rgba(0,0,0, 0.1) 0px 0px 8px;
+}
+.dataform {
+	background-color: #E6ECEC;
+	padding: 5px;
+	position: relative;
+	border:none;
+}
+.dataform2 {
+	background-color: #E6ECEC;
+	padding: 5px;
+	position: relative;
+	border:none;
+}
+.dataform_caption {
+	padding: 4px;
+	margin-left:1px;
+	margin-right:1px;
+	margin-bottom:-1px;
+	font-weight: bold;
+	color: #ffffff;
+	font-size: 80%;
+	text-align: center;
+	background-color: #82A6B2;
+
+	background: -webkit-gradient(linear, left top, left 25, from(#82A6B2), color-stop(3%, #C5D5D5), to(#80A4B0));
+	box-shadow: rgba(0,0,0, 0.1) 0px 0px 8px;
+	-moz-box-shadow: rgba(0,0,0, 0.1) 0px 0px 8px;
+	-webkit-box-shadow: rgba(0,0,0, 0.1) 0px 0px 8px;
+}
+
+legend {
+	font: sans-serif;
+	font-weight: bold;
+	color: #303030;
+	margin: 0 0 0 -1px;
+	padding: .2em .5em;
+	display: block;
+	float: right;
+
+}
+
+label {
+	display: block;
+	margin: 5px 0 0 0;
+	font-size: 80%;
+	color: #303030;
+}
+
+div.errortooltipp {
+	display:block;
+	border: 2px solid #FA4F00;
+	padding:2px;
+	background-color: #FFA8A8;
+	color: #FA0000;
+	font: 11px Arial, Helvetica, sans-serif;
+}
+
+div.successtooltipp {
+	display:block;
+	border: 2px solid #006D18;
+	padding:2px;
+	background-color: #29FF2D;
+	color: #006D18;
+	font: 11px Arial, Helvetica, sans-serif;
+}
+
+div.progressbar_holder{ border: 1px solid #aaa;
+	width: 100px;
+	display: none;}
+div.progressbar{ background: #f00;
+	width: 0;
+	font-size: 1px;
+	line-height: 10px;}
+

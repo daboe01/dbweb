@@ -1,0 +1,38 @@
+As for the MVC-view layer, the dbweb framework introduces the following tags:
+
+<foreach:_displayGroup_ [parameters]> [...] </foreach>
+Replicates the contents for each row of data in _displayGroup_.
+parameters:
+perl="xx" code is run for each replication. 
+
+<form:_displayGroup_ [parameters]> [...] </form>
+encloses a form for editing data from _displayGroup_
+parameters can be in addition to conventional HTML parameters:
+label="aLabel" (caption), 
+perl="xx" code is run after each change. 
+
+<var:_field_ [parameters] >
+ _field_ is a valid field of the current displayGroup.
+parameters can be in addition to conventional HTML parameters:
+	edittype=text, combo, popup, boolean or textarea, button, img
+	format:label="aLabel" (caption)
+	format:lookup="DG.column" for combo, popup
+	format:typeahead="DG.column" for text
+	editmode=inplace	to activate the ajax inplace editor
+	format:date="%d.%y.%Y %H:%M" format as in POSIX
+	perl="xx" for button
+
+edittypes
+img
+has to be followed by uri of img. in case of perl="_xxx_" val can be retrieved by pendingPrimaryKey() function cleaned from any non alphanum chars.
+
+As for the MVC-control layer, the dbweb framework introduces the following tags:
+
+<perlfunc name="_handler_" include="y"> { _perlcode_ } </perlfunc>
+ _perlcode_ may call the following api:
+$DG::_dg_->method(); _dg_ is one of the models DisplayGroups, method is in the api doc.
+
+special handlers are _onload_, _bootstrap_, _earlyauto_ and _auto_
+
+
+As for the MVC-control layer, the dbweb framework introduces DisplayGroups as following:
