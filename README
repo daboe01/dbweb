@@ -6,11 +6,11 @@ gui centric desktop-database systems (such as ms-access) let you design database
 
 dbweb will give you this functionality for web applications that are based on bare bones SQL databases such as postgres (in theory any DBI compatible database will do).
 
-dbweb only needs a model of your database (just like in CoreData or EOF) and a GUI description (superset of html).
+dbweb only needs a model of your database (just like in CoreData or EOF) and a GUI description (here: superset of plain html).
 
-frome here, you can extend your application with arbitrary controller code (written in perl). These functions can be triggered from the GUI (e.g. context menu, button). E.g. the app can dowload pdf or excel files thanks to the power of cpan...
+from here, you can extend your application with arbitrary controller code (written in perl). These functions can be triggered from the GUI (e.g. context menu, button). E.g. the app can dowload pdf or excel files thanks to the power of cpan...
 
-Although dbweb provides fully interactive user experience, all coding is server-side, thanks to state-of-the-art ajax technology. This approach ensures security and robustness of the application.
+Although dbweb provides fully interactive user experience, all coding is server-side (even within a single file, if you like). this is possible by state-of-the-art ajax technology, transparent to the application developer. Styling of the application is pure css.
 
 *****
 
