@@ -6,7 +6,7 @@ use TempFileNames;
 
 ###################################
 #
-# workaround a recursion bug in perl (segmentation fault)
+# workaround a recursion bug in perl 5.8 (segmentation fault)
 #
 sub __expandPDFDict { my ($block,$dict)=@_;
 	foreach my $key (keys %{$dict})
@@ -115,19 +115,6 @@ sub returnPDF { my ($data)=@_;
 	$dbweb::_isMuted=1;
 }
 
-sub labelPrinter { my ($str, $objc)=@_;
-	use Net::FTP;
-	use Locale::Recode;
-	my $tmpfilename=tempFileName('/tmp/dbweb', '');
-	my $transcoder=Locale::Recode->new (from => 'ISO-8859-1', to => 'IBM437' );
-	my $data= expandPDFDict($str, $objc);
-	$transcoder->recode($data);
-	writeFile($tmpfilename, $data);
-	my $ftp = Net::FTP->new("10.210.98.254", Debug => 0) or warn "Cannot connect to host: $@";
-	$ftp->login('xxxx');
-	$ftp->put($tmpfilename,"LPT1");
-}
-
 sub LPRPrint { my ($data, $printer, $copies, $options)=@_;
 	my $prn="/usr/bin/lpr -P $printer -# "."$copies -o $options ";
 	my $tmpfilename=tempFileName('/tmp/dbweb', '');
@@ -142,40 +129,5 @@ sub applyDictToRTF { my ($dict,$rtf)=@_;
 	while(my($key,$val)=each %{$dict} )
 	{	$rtf =~s/\{\\\*\\bkmkstart $key\}\{\\\*\\bkmkend $key\}/$val/egs
 	} return $rtf;
-}
-
-use Net::FTP;
-use passwordsecrets;
-
-sub docscalFilesForPIZTypeAndDate { my ($piz,$type,$udate)=@_;
-	my $ftp = Net::FTP->new("10.210.21.10", Debug => 0) or warn "Cannot connect to host: $@";
-	   $ftp->login($imgname, $imgpassword);
-	   $ftp->binary();
-
-	my $spath;
-	$spath='/Daten/DigitaleAkte/PatientenAkten/'.$1.'/'.$2.'/'.$3.'/'.$piz if $piz=~/^(..)(..)(..)/o;
-	$udate=$1.'-'.$2.'-'.$3  if $udate =~/^([0-9]{4})-([0-9]{2})-([0-9]{2})/o;
-
-	$ftp->cwd($spath);
-	my @types=$ftp->ls();
-
-	my @ret;
-	foreach my $type (grep {/$type/} (@types))
-	{	$ftp->cwd($spath.'/'.$type);
-		my @files=$ftp->ls();
-		foreach my $file (@files)
-		{	my (undef, $date,$inst,$type)=split /_/o, $file;
-#warn $file;
-			my ($y,$m,$d)= $date =~/^(....)(..)(..)/o;
-			$date="$y-$m-$d";
-			if($date eq $udate)
-			{	my $dfile='/www/data/tmp/'.$file;
-				$dfile=~s/PDF$/pdf/o;
-				$dfile=~s/JPG$/jpg/o;
-				$ftp->get($file, $dfile) or warn "get failed ", $ftp->message;
-				push(@ret,  {Date=>$date, type=>$type, path=>$dfile});
-			}
-		}
-	} return \@ret;
 }
 
