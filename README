@@ -1,0 +1,55 @@
+dbweb: a declarative MVC web framework:
+
+*****
+
+gui centric desktop-database systems (such as ms-access) let you design database applications that are "automagically" at sync with the data stored in the database tables. selection together with editing of rows (e.g. master detail) is automatically handled. the correct rows are updated upon editing without any cusotm coding.
+
+dbweb will give you this functionality for web applications that are based on bare bones SQL databases such as postgres (in theory any DBI compatible database will do).
+
+dbweb only needs a model of your database (just like in CoreData or EOF) and a GUI description (superset of html).
+
+frome here, you can extend your application with arbitrary controller code (written in perl). These functions can be triggered from the GUI (e.g. context menu, button). E.g. the app can dowload pdf or excel files thanks to the power of cpan...
+
+Although dbweb provides fully interactive user experience, all coding is server-side, thanks to state-of-the-art ajax technology. This approach ensures security and robustness of the application.
+
+*****
+
+As for the view layer, the dbweb framework introduces the following tags that can freely be interweaved into the html markup:
+
+<foreach:_displayGroup_ [parameters]> [...] </foreach>
+Replicates the enclosed contents for each row of data in _displayGroup_.
+this contents typically includes <var:_field_> tags (see below)
+parameters:
+perl="xx" code is run for each row. 
+
+<form:_displayGroup_ [parameters]> [...] </form>
+encloses a form for editing data from _displayGroup_
+parameters can be in addition to conventional HTML parameters:
+label="aLabel" (caption), 
+perl="xx" code is run after each change. 
+
+<var:_field_ [parameters] >
+ _field_ is a valid field of the current displayGroup.
+parameters can be in addition to conventional HTML parameters:
+	edittype=text, combo, popup, boolean or textarea, button, img
+	format:label="aLabel" (caption)
+	format:lookup="DG.column" for combo, popup
+	format:typeahead="DG.column" for text
+	editmode=inplace	to activate the ajax inplace editor
+	format:date="%d.%y.%Y %H:%M" format as in POSIX
+	perl="xx" for button
+
+in case of perl="_xxx_" val can be retrieved by pendingPrimaryKey() function cleaned from any non alphanum chars.
+
+As for the MVC-control layer, the dbweb framework introduces the following tags:
+
+<perlfunc name="_handler_" include="y"> { _perlcode_ } </perlfunc>
+ _perlcode_ may call the following api:
+$DG::_dg_->method(); _dg_ is one of the models DisplayGroups, method is in the api doc.
+<!> to be written
+
+special handlers are _onload_, _bootstrap_, _earlyauto_ and _auto_
+
+
+As for the MVC-control layer, the dbweb framework introduces DisplayGroups as following:
+<!> to be written
