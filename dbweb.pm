@@ -410,7 +410,6 @@ sub _removeUIElement { my ($self, $button, $template2)=@_;
 	_removeFromSnapshots($dgn, $button);
 }
 sub addUserscript { my ($script)=@_;
-	my $idname='ujs_'.$dbweb::_uniqueID++;
 	$dbweb::JSConfigs{userscripts}->{$script}='';
 }
 
