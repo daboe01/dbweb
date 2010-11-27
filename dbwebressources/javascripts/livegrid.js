@@ -19,7 +19,7 @@ LiveGridScroller.prototype = {
 	},
 
 	createScrollBar: function(offset) {
-		var visibleHeight = this.liveGrid.viewPort.visibleHeight();
+		var visibleHeight = (this.liveGrid.viewPort.visibleHeight()-9);
 		// create the outer div...
 		this.scrollerDiv  = document.createElement("div");
 		var scrollerStyle = this.scrollerDiv.style;

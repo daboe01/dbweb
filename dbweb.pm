@@ -410,6 +410,7 @@ sub _removeUIElement { my ($self, $button, $template2)=@_;
 	_removeFromSnapshots($dgn, $button);
 }
 sub addUserscript { my ($script)=@_;
+	my $idname='ujs_'.$dbweb::_uniqueID++;
 	$dbweb::JSConfigs{userscripts}->{$script}='';
 }
 
@@ -2185,17 +2186,17 @@ __APIEOF__
 sub getJSCode { return <<'__JSEOF__'
 <html>
 <head>
-<link rel=stylesheet type="text/css" href="/dbwebressources/style.css"/>
-<link rel=stylesheet type="text/css" href="/dbwebressources/__APPRESS__.css"/>
-<script src="/dbwebressources/javascripts/prototype.js" type="text/javascript"></script>
-<script src="/dbwebressources/javascripts/scriptaculous.js" type="text/javascript"></script>
-<script src="/dbwebressources/javascripts/combobox.js" type="text/javascript"></script>
-<script src="/dbwebressources/javascripts/contextmenu.js" type="text/javascript"></script>
-<script src="/dbwebressources/javascripts/livegrid.js" type="text/javascript"></script>
-<script src="/dbwebressources/javascripts/progress.js" type="text/javascript"></script>
-<script src="/dbwebressources/javascripts/border.js" type="text/javascript"></script>
-<script src="/dbwebressources/javascripts/hotkey.js" type="text/javascript"></script>
-<script src="/dbwebressources/javascripts/dbweb_v08.js" type="text/javascript"></script>
+<link rel=stylesheet href="/dbwebressources/style.css"/>
+<link rel=stylesheet href="/dbwebressources/__APPRESS__.css"/>
+<script src="/dbwebressources/javascripts/prototype.js"></script>
+<script src="/dbwebressources/javascripts/scriptaculous.js"></script>
+<script src="/dbwebressources/javascripts/combobox.js"></script>
+<script src="/dbwebressources/javascripts/contextmenu.js"></script>
+<script src="/dbwebressources/javascripts/livegrid.js"></script>
+<script src="/dbwebressources/javascripts/progress.js"></script>
+<script src="/dbwebressources/javascripts/border.js"></script>
+<script src="/dbwebressources/javascripts/hotkey.js"></script>
+<script src="/dbwebressources/javascripts/dbweb_v08.js"></script>
 __ADDHTML__
 
 <script language=javascript>

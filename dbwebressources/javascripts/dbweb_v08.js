@@ -95,7 +95,7 @@ DBWeb.prototype = {
 			$$('.dataform_caption').each(function(fs)
 			{	new Corner(fs,{corners:"top"});
 			});
-			//document.onselectstart=function (e) { e.stop(); return false; }.bindAsEventListener(this);
+			document.onselectstart=function (e) { e.stop(); return false; }.bindAsEventListener(this);
 
 		}
         Event.observe(window, 'beforeunload', function(e)
@@ -209,7 +209,8 @@ DBWeb.prototype = {
 										//<!> catch writeconflicts as in old version
 										switch(e.type)
 										{	case "text": case "textarea": case "password":
-												e.value=pairs.inplace.val;
+												if (pairs.hasOwnProperty('inplace') && pairs.inplace.hasOwnProperty('val'))
+													e.value=pairs.inplace.val;
 											break;
 											case "checkbox": case "select-one":
 												// <!> no instant feedback at the moment

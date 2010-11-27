@@ -2,54 +2,18 @@ dbweb: a declarative MVC web framework:
 
 *****
 
-gui centric desktop-database systems (such as ms-access) let you design database applications that are "automagically" at sync with the data stored in the database tables. selection together with editing of rows (e.g. master detail) is automatically handled. the correct rows are updated upon editing without any cusotm coding.
+Introduction
+Desktop-databases are perfect for rapid GUI prototyping. The major advantage is that GUI forms are always at sync with the database --- without any explicit programming. However, many of these products under-perform in heavily concurrent production environments. 
 
-dbweb will give you this functionality for web applications that are based on bare bones SQL databases such as postgres (in theory any DBI compatible database will do).
+<dbweb> is an Apache2-based web framework that provides rapid prototyping as well as robust production out of the box. You can write a fully CRUD-functional web application in HTML syntax only. 
+Additionally, <dbweb> introduces specialized input elements such as ComboBox or DataGrid. These allow for handling very large data-sets as they fetch the data on demand and do not require  data pagination.
 
-dbweb only needs a model of your database (just like in CoreData or EOF) and a GUI description (here: superset of plain html).
+All your application code (e.g. invoked from buttons, context menus or by data editing) runs server-side\footnote{Currently, only Perl is supported, future releases may also support (server-side) Javascript}.
+<dbweb> applications are nevertheless fully interactive and provide  confirm-dialogs or GUI-animation effects for immediate feedback. This is possible through Ajax technology. The Ajax-layer is hidden  to the  application developer by default.
+An object oriented API provides access to the database through a thin object-relational mapper.
 
-from here, you can extend your application with arbitrary controller code (written in perl). These functions can be triggered from the GUI (e.g. context menu, button). E.g. the app can dowload pdf or excel files thanks to the power of cpan...
+Overview
+In <dbweb>, the GUI is laid out in HTML between the HTML5  {\tt<html>} and {\tt</html>} tags. You can use your favourite   HTML/CSS techniques for designing the GUI. <dbweb> introduces only a few additional tags (the most common are {\tt <foreach:..>... </foreach>}, {\tt <form:..>...</form>} and {\tt <var:..>}).  These tags always refer to  {\it DisplayGroup}s which connect the GUI to your databases. We discuss DisplayGroups  in chapter \ref{chap:dg}. 
 
-Although dbweb provides fully interactive user experience, all coding is server-side (even within a single file, if you like). this is possible by state-of-the-art ajax technology, transparent to the application developer. Styling of the application is pure css.
-
-*****
-
-As for the view layer, the dbweb framework introduces the following tags that can freely be interweaved into the html markup:
-
-<foreach:_displayGroup_ [parameters]> [...] </foreach>
-Replicates the enclosed contents for each row of data in _displayGroup_.
-this contents typically includes <var:_field_> tags (see below)
-parameters:
-perl="xx" code is run for each row. 
-
-<form:_displayGroup_ [parameters]> [...] </form>
-encloses a form for editing data from _displayGroup_
-parameters can be in addition to conventional HTML parameters:
-label="aLabel" (caption), 
-perl="xx" code is run after each change. 
-
-<var:_field_ [parameters] >
- _field_ is a valid field of the current displayGroup.
-parameters can be in addition to conventional HTML parameters:
-	edittype=text, combo, popup, boolean or textarea, button, img
-	format:label="aLabel" (caption)
-	format:lookup="DG.column" for combo, popup
-	format:typeahead="DG.column" for text
-	editmode=inplace	to activate the ajax inplace editor
-	format:date="%d.%y.%Y %H:%M" format as in POSIX
-	perl="xx" for button
-
-in case of perl="_xxx_" val can be retrieved by pendingPrimaryKey() function cleaned from any non alphanum chars.
-
-As for the MVC-control layer, the dbweb framework introduces the following tags:
-
-<perlfunc name="_handler_" include="y"> { _perlcode_ } </perlfunc>
- _perlcode_ may call the following api:
-$DG::_dg_->method(); _dg_ is one of the models DisplayGroups, method is in the api doc.
-<!> to be written
-
-special handlers are _onload_, _bootstrap_, _earlyauto_ and _auto_
-
-
-As for the MVC-control layer, the dbweb framework introduces DisplayGroups as following:
-<!> to be written
+Briefly, a DisplayGroup basically represents a single table/view in the database but additionally keeps track of row selection (a single row is always selected). The selection can be changed interactively by the user through clicking at any row, or programmatically through the API.  DisplayGroups can be connected to other DisplayGroups in master-detail configurations \footnote{\url{http://en.wikipedia.org/wiki/Master-detail}}. Commonly, a DisplayGroup feeds the data row-wise into a HTML table or a more specialized DataGrid view. Data can be edited in the tables or within dedicated forms. By default, all edits are immediately committed when the input element loses focus. All changes are reflected throughout  the GUI without page reloading.
+DisplayGroups can also be enriched with context menus. This context menu appears whenever data from the appropriate DisplayGroup is right-clicked. The context-menu commonly triggers server-side application code (chapter \ref{chap:coding}).
