@@ -11,15 +11,9 @@ LiveGridScroller.prototype = {
 		this.viewPort = liveGrid.viewPort;
 		this.moveScroll(offset);
 	},
-	sizeIEHeaderHack: function() {
-		var headerTable = this.liveGrid.tableHeader;
-		if (headerTable )
-		  headerTable.rows[0].cells[0].style.width =
-			  (parseInt(headerTable.rows[0].cells[0].offsetWidth) + 1) + "px";
-	},
 
 	createScrollBar: function(offset) {
-		var visibleHeight = (this.liveGrid.viewPort.visibleHeight()-9);
+		var visibleHeight = (this.liveGrid.viewPort.visibleHeight());
 		// create the outer div...
 		this.scrollerDiv  = document.createElement("div");
 		var scrollerStyle = this.scrollerDiv.style;
@@ -34,11 +28,10 @@ LiveGridScroller.prototype = {
 		this.heightDiv = document.createElement("div");
 		this.heightDiv.style.width  = "1px";
 
-		this.heightDiv.style.height = parseInt(visibleHeight * this.liveGrid.totalRows/this.liveGrid.pageSize) + "px" ;
+		this.heightDiv.style.height = (Math.floor(visibleHeight * this.liveGrid.totalRows/this.liveGrid.pageSize) ) + "px" ;
 		this.scrollerDiv.appendChild(this.heightDiv);
 		this.scrollerDiv.onscroll = this.handleScroll.bindAsEventListener(this);
 
-		if(Prototype.Browser.IE) this.sizeIEHeaderHack();
 
 		var table = this.liveGrid.table;
 		table.insert( {before: this.scrollerDiv} );
@@ -89,8 +82,8 @@ LiveGridDataChunk.prototype = {
 		{	var first= Math.max(0,topVisibleRow-this.offset);
 			var updateSkip=topVisibleRow<this.offset ? this.offset-topVisibleRow:0;
 			var end= Math.min(first+this.liveGrid.pageSize-updateSkip, this.rows.length);
-			if(end>first)
-				this.liveGrid.viewPort._copyRows(this.rows.slice(first, end+1),updateSkip);
+			if (end > first)
+				this.liveGrid.viewPort._copyRows(this.rows.slice(first, end), updateSkip);
 		}
 		if(this.liveGrid.buffer._coalesce()) 
 			setTimeout(this.coalesceAndUpdate.bind(this,start), 5);
@@ -194,7 +187,7 @@ LiveGridBuffer.prototype = {
 		if(c && c.rows)
 		{	var first= Math.max(0, start-c.offset)
 			var end= Math.min(first+count, c.rows.length);
-			if(end>first) return c.rows.slice(first, end+1);
+			if (end > first) return c.rows.slice(first, end);
 		}
 		else return new Array();
 	}
@@ -211,20 +204,21 @@ GridViewPort.prototype = {
 		this.table = liveGrid.table
 		this.buffer = liveGrid.buffer;
 
-		this.rowHeight = this.table.offsetHeight/liveGrid.pageSize;
+		this.rowHeight = (this.table.offsetHeight/liveGrid.pageSize);
 		new Insertion.Before(this.table, "<div id='"+liveGrid.tableId+"_container'></div>");
 		this.table.previousSibling.appendChild(this.table);
 		new Insertion.Before(this.table,"<div id='"+ liveGrid.tableId+"_viewport' style='float:left;'></div>");
 		this.table.previousSibling.appendChild(this.table);
 		this.div = this.table.parentNode;
-		this.div.style.height = ((this.rowHeight * liveGrid.pageSize)+8) + "px";
+		//this.div.style.height = ((this.rowHeight * liveGrid.pageSize)) + "px";	//+8
+		this.div.style.height = (this.table.offsetHeight) + "px";
 		this.div.style.width=(liveGrid.tableHeader.getWidth()+(Prototype.Browser.IE?30:16))+ "px";
 		this.div.style.overflow = "hidden";
 		this.topRow=0;
-		this.visibleRows = liveGrid.pageSize +1;
+		this.visibleRows = liveGrid.pageSize;
 	},
 	_copyRows: function(rows, skip)
-	{	var l= Math.min(this.table.rows.length,rows.length);
+	{	var l= Math.min(this.visibleRows, rows.length);
 		if(Prototype.Browser.IE)
 		{	for (var i=0; i < l; i++)
 			{	var cells=rows[i][1].split('</td>');
@@ -250,9 +244,8 @@ GridViewPort.prototype = {
 	},
 
 	scrollToPixel: function(pixelOffset) {		
-		this.topRow= parseInt( (pixelOffset) / this.rowHeight );
+		this.topRow= Math.ceil( (pixelOffset) / this.rowHeight );
 		this.refreshContents(this.topRow);
-		this.div.scrollTop = pixelOffset % this.rowHeight;
 	},
 	getElementsComputedStyle: function ( htmlElement, cssProperty, mozillaEquivalentCSS) {
 		if ( arguments.length == 2 ) mozillaEquivalentCSS = cssProperty;

@@ -6,8 +6,6 @@
 # todo:
 #	load bootstrap HTML from file if appropriate env is set.
 #	whitelist for pk and perlfunc selection.
-#	conditional context menus: no whitespaces should be needed for operators. AJAXify conditions
-#	include fallback when JS is turned off.
 
 #
 # dbweb application server
@@ -148,23 +146,28 @@ sub selectedDict { my ($self,$opts)=@_;
 	return (length $pk)? $self->dictForPK($pk): undef;
 }
 
-sub _dictsForRows { my ($self,  $arr)=@_;
+sub _dictsForRows { my ($self,  $arr,  $utf8)=@_;
 	return undef if(!$arr || $#{$arr}==-1);
 	my @cols=@{$self->{columns}};
-	my $i;
 	my @ret=map
-	{	my $ddict={};
-		my $l=$#cols;
-		for($i=0; $i <= $l; $i++)
-		{	$ddict-> {$cols[$i]}=$_->[$i];
+	{	my $ddict;
+		for(my $i=0; $i <= $#cols; $i++)
+		{	my $val=$_->[$i];
+			if($utf8)
+			{	my $transcoder=$dbweb::_dbhE{dbweb::getDBHForDG($self)};
+				Encode::_utf8_off($val);
+				Encode::from_to(  $val, $transcoder->{encoding}, 'utf8');
+				Encode::_utf8_on( $val);
+			}
+			$ddict-> {$cols[$i]}=$val;
 		}
 		$ddict;
 	} (@{$arr});
 	return \@ret;
 }
 
-sub dictsForWhereClauseDictRaw { my ($self,$dict,$opts)=@_;
-	my $erg=$self->_dictsForRows(dbweb::getRawDataForDG($self, $dict,$opts));
+sub dictsForWhereClauseDictRaw { my ($self,$dict,$opts, $utf8)=@_;
+	my $erg=$self->_dictsForRows(dbweb::getRawDataForDG($self, $dict,$opts), $utf8);
 	return $erg if(length $erg && $#{$erg}>-1);
 	return undef;
 }
@@ -410,7 +413,6 @@ sub _removeUIElement { my ($self, $button, $template2)=@_;
 	_removeFromSnapshots($dgn, $button);
 }
 sub addUserscript { my ($script)=@_;
-	my $idname='ujs_'.$dbweb::_uniqueID++;
 	$dbweb::JSConfigs{userscripts}->{$script}='';
 }
 
@@ -477,7 +479,7 @@ sub whereclauseTemplateForDict { my ($dict, $types, $likes, $params, $transcoder
 	{	my 	($val,$op)= ($dict->{$currKey},'=');
 
 		if(exists $likes->{$currKey})
-		{	$op='~*';
+		{	$op='::text~*';
 		} elsif(ref($val) eq 'HASH')
 		{	if($val->{op} eq 'literal')
 			{	$op =$val->{val};
@@ -613,7 +615,6 @@ sub evalCacheCriteriaInDGForWhereClause { my ($displayGroup, $whereClause)=@_;
 }
 
 sub getColumnsFromCacheForDGNAndDict { my ($dbh, $displayGroupName, $whereClause, $sortArr, $opts)=@_;
-	my $ret=[];
 	my $displayGroup=$dbweb::displayGroups->{$displayGroupName};
 	my $data= ( (exists $displayGroup->{data})? $displayGroup->{data} : sessionData('cache_'.$displayGroupName) );
 	if($data && $#{$data}>=0)
@@ -623,15 +624,16 @@ sub getColumnsFromCacheForDGNAndDict { my ($dbh, $displayGroupName, $whereClause
 		if($opts->{countOnly})
 		{	my $cnt= scalar @myarr;
 			return [[$cnt]];
-		} if( $opts->{limit} >0)	#<!> seems to break conditions (for yet unknown reasons)
-		{	my $last=scalar @myarr;
-			$last=$opts->{offset}+(($opts->{offset}+$opts->{limit}< $last))? $opts->{offset}+$opts->{limit}:$last;
-			return [@myarr[$opts->{offset}..$last-1]];
+		} elsif( $opts->{limit} > 0)	#<!> seems to break conditions (for yet unknown reasons)
+		{	my ($offset,$limit) = ($opts->{offset},$opts-> {limit});
+			my $last =(scalar @myarr);
+			$last=($offset+$limit> $last)? $last: $offset+$limit;
+			return [@myarr[$offset..$last-1]];
 		}
 		return \@myarr;
 	}
 	return [] unless($dbh);
-	$ret=getColumnsOfTableForDict($dbh,$displayGroup->{columns},$displayGroup->{table}, undef, {sort=>$sortArr, types=>$displayGroup->{types} });
+	my $ret=getColumnsOfTableForDict($dbh,$displayGroup->{columns},$displayGroup->{table}, undef, {sort=>$sortArr, types=>$displayGroup->{types} });
 	if($#{$ret} >= 0)
 	{	sessionData('cache_'.$displayGroupName,$ret);
 		return getColumnsFromCacheForDGNAndDict($dbh,$displayGroupName, $whereClause, $sortArr,$opts);
@@ -1150,7 +1152,7 @@ sub boostSelectionForDGN { my ($dgn, $opts)=@_;
 	boostSelectionForDGN( $dg->{bindToDG}, $opts )
 		if(defined $dg->{bindToDG} && defined $displayGroups->{$dg->{bindToDG}});
 
-	my $data=getDataForDGN($dgn, $opts);
+	my $data=getDataForDGN($dgn, {%{$opts}});
 	if(length $data && $#{$data} >=0)
 	{	sessionData('selectedID_'.$dgn, $data->[0]->[getIndexOfColumnInDG($dg->{primaryKey}, $dg)]);
 	}
@@ -1268,8 +1270,13 @@ sub dataEssentalsTableHeader { my ($displayGroupName, $opts)=@_;
 	($displayGroupName, $filterName)=($1,$2) if($displayGroupName=~/(.*?)\.(.*)/o);
 
 	$opts->{filter}= $filterName if (length $filterName);
-	$opts->{limit}=  $opts->{length};
-
+	$opts->{limit}= $opts->{length};
+	if(my $overrideDefaultSorting=sessionData('defaultsortfilter_'.$displayGroupName))
+	{	$overrideDefaultSorting.='_rev' if (sessionData('defaultsortupdown_'.$displayGroupName) eq 'up');
+		my $dg=$dbweb::displayGroups->{$displayGroupName};
+		$opts->{sort}=$dg->{sortColumns}->{$overrideDefaultSorting}
+			if(exists $dg->{sortColumns} && exists $dg->{sortColumns}->{$overrideDefaultSorting});
+	}
 	my	$data=getDataForDGN($displayGroupName, $opts);
 	return ($data, $displayGroupName, $filterName);
 }
@@ -1296,8 +1303,11 @@ sub handleTable { my ($rawDisplayGroupName, $block)=@_;
 	my $idname = uniqueTabNameForDGName($displayGroupName);
 	my $head;
 	if(scalar @cols)
-	{	$head='<table id="'. $idname.'_header" class="datatable" style="width:'.$totalWidth.'px; table-layout: fixed;">'. $pref1.'<tr>';
-		$head.='<th style="width:'.$_->{width}.$_->{unit}.';">'.$_->{name}.'</th>' for (@cols);
+	{	my $sortable= sessionData('defaultsortfilter_'.$displayGroupName);
+		my $up_down=  sessionData('defaultsortupdown_'.$displayGroupName);
+
+		$head='<table id="'. $idname.'_header" class="datatable" style="width:'.$totalWidth.'px; table-layout: fixed;">'. $pref1.'<tr>';
+		$head.='<th onclick="dbweb.sortable('."'$displayGroupName','$_->{name}'".')" style="width:'.$_->{width}.$_->{unit}.';"'.($_->{name} =~ /\b\Q$sortable\E\b/? ('class="dbweb_sort_'.$up_down.'";') :'').'>'.$_->{name}.'</th>' for (@cols);
 		$head.='</tr></table>';
 		$ret.='<table id="'. $idname.'" class="datatable" style="width:'.$totalWidth.'px;">';
 	}
@@ -1333,7 +1343,7 @@ sub handleTable { my ($rawDisplayGroupName, $block)=@_;
 		return $head.$ret. $foreachblock x $rows.'</table>';
 	} else
 	{	#  prevent flickering  but double fetches some rows on the con side...
-		my $params={ offset=>$offset, length=>$rows+1 };
+		my $params={ offset=>$offset, length=>$rows };
 		$params->{filter}=$filterName if($filterName);
 		$pref=handleForeach($rawDisplayGroupName, $foreachblock, $params);
 		return $head.$ret.$pref.'</table>';
@@ -1694,6 +1704,11 @@ sub CGIonlyAlphanum { my ($param)=@_;
 	$val=~s/[^0-9\.\/a-z_ ]//oigs;
 	return $val;
 }
+sub CGIonlyAlphanumStrict { my ($param)=@_;
+	my $val=decodeCGI($param);
+	$val=~s/[^0-9a-z_]//oigs;
+	return $val;
+}
 
 #<!> rename all lexicals (esp. $udict) by means of prefixing __ (to secure api)
 sub performDisplayGroupActions {
@@ -1758,6 +1773,15 @@ sub performDisplayGroupActions {
 		$dbweb::apache->content_type('text/html; charset=UTF-8');
 		$dbweb::apache->print(getGlobal($idname) );
 		return 1;
+	} elsif($dbweb::currentAjaxState == 9)		# change sorting
+	{	my $name= CGIonlyAlphanumStrict('name');
+		my $dg;
+		$dg=$dbweb::displayGroups->{$dgName} if( exists $dbweb::displayGroups->{$dgName} );
+		if($dg && exists $dg->{sortColumns} && exists $dg->{sortColumns}->{$name})
+		{	sessionData('defaultsortfilter_'.$dgName, $name);
+			my $oldval= sessionData('defaultsortupdown_'.$dgName);
+			sessionData('defaultsortupdown_'.$dgName, $oldval=~/down/? 'up':'down');
+		}
 	} elsif($inplace)		# inplace editor
 	{	my $field = ($inplace =~ /^$dgName\_(.*)/)? $1 : undef;
 		if($field)
@@ -1808,7 +1832,7 @@ sub performDisplayGroupActions {
 						if($different)
 						{	if ($dbweb::ajaxReturn{element}  && $inplace)
 							{	$dbweb::ajaxReturn{oldval}{$dbweb::ajaxReturn{element}}=$oldvals->{$inplace};
-								$dbweb::ajaxReturn{error}{$dbweb::ajaxReturn{element}}='snapshot inconsisten with database (concurrent update from multiple sessions?)';
+								$dbweb::ajaxReturn{error}{$dbweb::ajaxReturn{element}}='snapshot inconsistent with database (concurrent update from multiple sessions?)';
 							}
 						}
 						logToUndoStack('update',$displayGroup,dbweb::stringFromProperty($udict), dbweb::stringFromProperty($oldvals),$wheredict);
@@ -2196,7 +2220,7 @@ sub getJSCode { return <<'__JSEOF__'
 <script src="/dbwebressources/javascripts/progress.js"></script>
 <script src="/dbwebressources/javascripts/border.js"></script>
 <script src="/dbwebressources/javascripts/hotkey.js"></script>
-<script src="/dbwebressources/javascripts/dbweb_v08.js"></script>
+<script src="/dbwebressources/javascripts/dbweb_v09.js"></script>
 __ADDHTML__
 
 <script language=javascript>
