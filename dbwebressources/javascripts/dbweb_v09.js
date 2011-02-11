@@ -14,6 +14,7 @@ DBWeb.prototype = {
 		this.focuspath='';
 		this.userscripts=null;
 		this.alertOnLeave=false;
+		this.page_curry=1;
 
 
 		new Ajax.Request(this.uri, {
@@ -40,6 +41,7 @@ DBWeb.prototype = {
 			alert(error.description);
 		};
 
+		this.page_curry++;
 		$A(document.forms).each(function(form, i)
 		{	if(form.className.indexOf('DBW_noajax') < 0)
 				Event.observe(form, 'submit', this.submitHandler.bindAsEventListener(this,form));
@@ -50,8 +52,8 @@ DBWeb.prototype = {
 		{	if( $(id) != null ) // <!>hasOwnProperty
 			{	var d=pairs['jsconfig']['autocomplete'][id];
 				var props={noPulldown:false, visibleHeight:160, paramName: "fieldvalue", frequency:0.05, minChars:2, afterClickElement: function(elem, selection) { dbweb.submitEnriched(elem.form) } };
-					if(d['nopulldown']) props.noPulldown=true;
-					new ComboBoxAutocompleter(id, this.uri+"?"+this.basicParams()+"&ajax=1&dg="+d['dg']+"&filter="+d['filter']+"&field="+d['field']+"&pk="+d['pk'], props);
+				if(d['nopulldown']) props.noPulldown=true;
+				new ComboBoxAutocompleter(id, this.uri+"?"+this.basicParams()+"&ajax=1&dg="+d['dg']+"&filter="+d['filter']+"&field="+d['field']+"&pk="+d['pk'], props);
 			}
 		}
 		for ( var id in pairs['jsconfig']['watchers'] )
@@ -170,7 +172,7 @@ DBWeb.prototype = {
 		this.reloadPage();
 
 	},
-	handleReturn: function(evt, element)	// firefox fix
+	handleReturn: function(evt, element, curry)	// firefox fix
 	{	this.alertOnLeave=true;
 
 		if( (!Prototype.Browser.WebKit || navigator.userAgent.match(/AppleWebKit\/(\d+)/)[1] >= 533) &&
@@ -178,13 +180,13 @@ DBWeb.prototype = {
 			if( this._numberOfTextfieldsInForm(element.form) > 1 ) 
 				this.submitEnriched(element.form);
 	},
-	propagateChange: function(evt, element)
+	propagateChange: function(evt, element, curry)
 	{	this.changedForm=element.form;
 	},
-	saveFocus: function(evt, element)
+	saveFocus: function(evt, element, curry)
 	{	this.focusElement=element;
 	},
-	checkOnblur: function(evt, element)
+	checkOnblur: function(evt, element, curry)
 	{	this.alertOnLeave=false;
 		if(this.changedForm)
 		{	var fval=$F(element);
@@ -207,22 +209,22 @@ DBWeb.prototype = {
 										pattern.exec(pairs.inplace.key);
 										var sel='.DG_'+RegExp.$1+'.PK_'+pairs.inplace.pk+' a';
 										var field=RegExp.$2;
-										$$(sel).each(function(newval,fld, a){
-											if(a.className.indexOf(fld) >= 0)
-											{	a.innerHTML=newval;
-											}
-										}.bind(this,pairs.inplace.val,'FLD_'+field));
-										var e=$(pairs.inplace.key);
-										//<!> catch writeconflicts as in old version
-										switch(e.type)
-										{	case "text": case "textarea": case "password":
-												if (pairs.hasOwnProperty('inplace') && pairs.inplace.hasOwnProperty('val'))
+										if(curry==this.page_curry && pairs.hasOwnProperty('inplace') && pairs.inplace.hasOwnProperty('val'))
+										{	$$(sel).each(function(newval,fld, a){
+												if (a.className.indexOf (fld) >= 0)
+												{	a.innerHTML=newval;
+												}
+											}.bind(this, pairs.inplace.val, 'FLD_'+field));
+											var e=$(pairs.inplace.key);
+											//<!> catch writeconflicts as in old version
+											switch(e.type)
+											{	case "text": case "textarea": case "password":
 													e.value=pairs.inplace.val;
-
-											break;
-											case "checkbox": case "select-one":
-												// <!> no instant feedback at the moment
-											break;
+												break;
+												case "checkbox": case "select-one":
+													// <!> no instant feedback at the moment
+												break;
+											}
 										}
 									}
 								}.bind(this)
@@ -270,7 +272,7 @@ DBWeb.prototype = {
     reloadPage: function(){
         new Ajax.Request(this.uri,
             {   method: 'post',
-                postBody: this.basicParams()+"&ajax=9",
+                postBody: this.basicParams()+"&ajax=10",
                 asynchronous: false,
                 onSuccess: function(t)
                 {   this._reboot(t.responseText);
@@ -337,6 +339,7 @@ DBWeb.prototype = {
 	submitAction: function(confirmtext, formname, noajax, progress, button)
 	{	if(progress>0)
 		{	var elem= new Element('div');
+			if(!noajax) button.disabled=true;
 			$(button).insert( {after: elem} );
 			new ProgressBar(elem, 100, progress);
 		}
@@ -417,10 +420,10 @@ DBWeb.prototype = {
 	{	if(elem.className.indexOf('dbweb_delayedBinding') < 0)
 		{	switch(elem.type)
 			{	case "text": case "textarea": case "password":
-					Event.observe(elem, 'focus', this.saveFocus.bindAsEventListener(this,elem));
-					Event.observe(elem, 'keyup', this.handleReturn.bindAsEventListener(this,elem));
-					Event.observe(elem, 'change',this.propagateChange.bindAsEventListener(this,elem));
-					Event.observe(elem, 'blur',  this.checkOnblur.bindAsEventListener(this,elem));
+					Event.observe(elem, 'focus', this.saveFocus.bindAsEventListener(this,elem, this.page_curry));
+					Event.observe(elem, 'keyup', this.handleReturn.bindAsEventListener(this,elem, this.page_curry));
+					Event.observe(elem, 'change',this.propagateChange.bindAsEventListener(this,elem, this.page_curry));
+					Event.observe(elem, 'blur',  this.checkOnblur.bindAsEventListener(this,elem, this.page_curry));
 				break;
 				case "checkbox": case "select-one":
 					Event.observe(elem, 'change', this.enforceClick.bindAsEventListener(this,elem));

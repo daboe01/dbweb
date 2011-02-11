@@ -323,7 +323,7 @@ sub currentTimeString{
 sub currentDateString{
 	my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst)=localtime;
 	$year+=1900;$mon+=1;
-	return "$year-$mon-$mday";
+	return sprintf('%04d-%02d-%02d',$year,$mon,$mday);
 }
 
 # raw access
@@ -1932,6 +1932,7 @@ sub performDisplayGroupActions {
 	}
 	# step 3: garbage collection
 	nullifyForList(['ajaxtab'] , $dbweb::APPNAME);	#gc
+###	warn "currentAjaxState is: $dbweb::currentAjaxState";
 
 	# step 4: perform action perl code
 	#
@@ -1989,7 +1990,7 @@ sub initGlobals{
 # confgure "bootstrap" client-side javascript package
 sub activateApplication { my ($appname, $adduri)=@_;
 	$appname=$dbweb::loginname unless length $appname;
-	if($dbweb::currentAjaxState==7)
+	if($dbweb::currentAjaxState == 7)
 	{	my $uri= (length $dbweb::sessionid)? $dbweb::URI.'?sid='.$dbweb::sessionid.'&ajax=0&t='.$appname.$adduri: $dbweb::URI;
 		$dbweb::apache->content_type('json/html; charset=UTF-8');
 		$dbweb::apache->print( JSON::XS->new->utf8->encode( {redir_loc=> $uri } ) );
@@ -2039,7 +2040,8 @@ sub handler{
 	} else
 	{	$dbweb::currentAjaxState=CGIonlyDigits('ajax');
 		$forcedRedirect=$dbweb::loginname unless length $dbweb::currentAjaxState;
-		$dbweb::currentAjaxState=0 if($dbweb::currentAjaxState> 9 || $dbweb::currentAjaxState<0 || (!length $dbweb::currentAjaxState));
+		$dbweb::currentAjaxState=0 if($dbweb::currentAjaxState> 12 || $dbweb::currentAjaxState<0 || (!length $dbweb::currentAjaxState));
+
 	}
 
 	if(decodeCGI('cc'))									#logout
@@ -2146,7 +2148,7 @@ __HANDLER__: while(1){
 	{	my $key=$dbweb::ajaxReturn{element};
 		my $val=$dbweb::ajaxReturn{values}{$key};
 		my $old=$dbweb::ajaxReturn{oldval}{$key};
-		$inplaceData={key=>$key, val=>decode_entities($val), oldval=> decode_entities( $old), pk=> $dbweb::ajaxReturn{pk}};
+		$inplaceData={key=>$key, val=>decode_entities($val), oldval=> decode_entities( $old), pk=> $dbweb::ajaxReturn{pk}} if exists $dbweb::ajaxReturn{values}{$key};
 	}
 
 	my $d={appname=>$dbweb::APPNAME, jsconfig=>\%dbweb::JSConfigs, scripts=>$scripts, page=>$template, inplace=>$inplaceData, reload=>(length $dbweb::dbi_error)?1:0, id=>$dbweb::ajaxReturn{element} };
