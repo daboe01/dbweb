@@ -532,7 +532,7 @@ sub executeSQLTemplate { my ($dbh, $command, $suffixStr, $dict1, $whereClause, $
 	{	if( $currval->{type} == DBI::SQL_BOOLEAN)
 		{	$currval->{val}= ($currval->{val}=~/f/io)?0:1 unless($currval->{val}=~/[0-1]/o);
 		}
-		$sth->bind_param(++$i, $currval->{val}, $currval->{type} );
+		$sth->bind_param(++$i, $currval->{val}, { TYPE => $currval->{type}} );
 ###		$dbweb::logger->log_error("$currval->{val} ");
 	}
 	$sth->execute() || ($dbweb::logger->log_error("$sql: $DBI::errstr\n") );
