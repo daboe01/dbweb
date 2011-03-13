@@ -2,6 +2,14 @@
 	background: white url('combo.gif')
 	no-repeat top right;
 }
+.dbweb_sort_down {
+	background: white url('sort_asc.png')
+	no-repeat top right;
+}
+.dbweb_sort_up {
+	background: white url('sort_desc.png')
+	no-repeat top right;
+}
 
 div.menu {
 	position: absolute;
@@ -81,40 +89,37 @@ div.autocomplete {	position:absolute;	width:250px;	background-color:white;	b
 }
 .datatable {
 	font-size: 75%;
-	border: 1px solid #82A6B2;
+	border: 1px solid #77bb77;
+	box-shadow: rgba(0,0,0, 0.1) 0px 0px 8px;
+	-moz-box-shadow: rgba(0,0,0, 0.1) 0px 0px 8px;
+	-webkit-box-shadow: rgba(0,0,0, 0.1) 0px 0px 8px;
 }
 .selectedRow {
-	background-color: #C5DAE5;
-	margin: 4px;
-	border: 1px dotted #303030;
-	-moz-border-radius: 3px;
-	-webkit-border-radius: 3px;
+	background-color: #cceecc;
+	border: 1px dotted #630;
 }
 
 .datatable th {
-	color: #303030;
+	color: #360;
 	font-weight: bold;
-	background-color: #E6ECEC;
+	background-color: #eeffee;
 }
 .datatable td {
-	background-color: #E6ECEC;
-	-moz-border-radius: 5px;
-	-webkit-border-radius: 5px;
+	background-color: #ddffdd;
 }
 .datatable caption {
-	padding: 4px;
-	margin: 0px;
+	padding: 3px;
+	margin:0px;
 	font-weight: bold;
 	color: #ffffff;
-	background-color: #82A6B2;
-	background: -webkit-gradient(linear, left top, left 25, from(#82A6B2), color-stop(3%, #C5D5D5), to(#80A4B0));
-	box-shadow: rgba(0,0,0, 0.1) 0px 0px 8px;
+	background-color: #77bb77;
+	background: -webkit-gradient(linear, left top, left 25, from(#77bb77), to(#448844));
 	-moz-box-shadow: rgba(0,0,0, 0.1) 0px 0px 8px;
 	-webkit-box-shadow: rgba(0,0,0, 0.1) 0px 0px 8px;
 }
 
 .datatable a {
-	color: #303030;
+	color: #360;
 	text-decoration: none;
 	padding: 0;
 	margin: 0;
@@ -130,8 +135,8 @@ form {
 }
 
 fieldset {
-	background-color: #E6ECEC;
-	padding: 12px;
+	background-color: #c4ffbe;
+	padding: 10px;
     margin:0px;
 	position: relative;
 	border:none;
@@ -140,13 +145,13 @@ fieldset {
 	-webkit-box-shadow: rgba(0,0,0, 0.1) 0px 0px 8px;
 }
 .dataform {
-	background-color: #E6ECEC;
+	background-color: #c4ffbe;
 	padding: 5px;
 	position: relative;
 	border:none;
 }
 .dataform2 {
-	background-color: #E6ECEC;
+	background-color: #c4ffbe;
 	padding: 5px;
 	position: relative;
 	border:none;
@@ -158,32 +163,29 @@ fieldset {
 	margin-bottom:-1px;
 	font-weight: bold;
 	color: #ffffff;
+	background-color: #77bb77;
 	font-size: 80%;
 	text-align: center;
-	background-color: #82A6B2;
-
-	background: -webkit-gradient(linear, left top, left 25, from(#82A6B2), color-stop(3%, #C5D5D5), to(#80A4B0));
-	box-shadow: rgba(0,0,0, 0.1) 0px 0px 8px;
 	-moz-box-shadow: rgba(0,0,0, 0.1) 0px 0px 8px;
 	-webkit-box-shadow: rgba(0,0,0, 0.1) 0px 0px 8px;
+	background: -webkit-gradient(linear, left top, left 25, from(#77bb77), to(#448844));
 }
 
 legend {
 	font: sans-serif;
 	font-weight: bold;
-	color: #303030;
+	color: #360;
 	margin: 0 0 0 -1px;
 	padding: .2em .5em;
 	display: block;
 	float: right;
-
 }
 
 label {
 	display: block;
 	margin: 5px 0 0 0;
 	font-size: 80%;
-	color: #303030;
+	color: #360;
 }
 
 div.errortooltipp {
