@@ -777,6 +777,10 @@ sub getDBHForDG { my ($displayGroup)=@_;
 			$dbh->{pg_enable_utf8}=1 if($connDict->{connection}=~/:pg:/oi && $connDict->{encoding}=~/utf-?8/oi);
 			$dbweb::_dbhH{$connDict->{connection}}=$dbh;
 			$dbweb::_dbhE{$dbh}={ encoding=> $connDict->{encoding}, dateformatter=> undef };	# DateTime::Format::DBI->new($dbh)
+			if(my $sql=getGlobal('_autosql_'))
+			{	my $sth = $dbh->prepare( $sql );
+				$sth->execute() || ($dbweb::SQLDEBUG && $dbweb::logger->log_error("$sql $DBI::errstr\n"));
+			}
 		}
 		return $dbh;
 	} return undef;
