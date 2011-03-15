@@ -449,7 +449,7 @@ sub setGlobal { my ($dict)=@_;
 ###############################################
 
 sub DBType { my ($key,$types)=@_;
-	my $typesMapper={ 'int' => DBI::SQL_TYPE_INTEGER, 'date' => DBI::SQL_TYPE_TIMESTAMP, 'real' => DBI::SQL_REAL, 'time' => DBI::SQL_TYPE_TIMESTAMP, 'bool' => DBI::SQL_BOOLEAN};
+	my $typesMapper={ 'int' => DBI::SQL_INTEGER, 'date' => DBI::SQL_TYPE_TIMESTAMP, 'real' => DBI::SQL_REAL, 'time' => DBI::SQL_TYPE_TIMESTAMP, 'bool' => DBI::SQL_BOOLEAN};
 	return $typesMapper->{$types->{$key}} if(exists $types->{$key});
 	return DBI::SQL_VARCHAR;
 }
@@ -1172,19 +1172,18 @@ sub handleCond { my ($displayGroupName, $field, $block, $datarow)=@_;
 	$whereClause= whereClauseForFilterOfDGName($filter, $displayGroupName) if length $filter;
 
 	unless(length $var)
-	{	if($field=~/selection=(true|false|visible|invisible)/oigs)
+	{	if($field=~/selection=(true|false|visible|empty)/oigs)
 		{	my $dst=0;
 			my $bool=$1;
-			if($bool eq 'visible' || $bool eq 'invisible')
+			if($bool =~/visible|empty/o)
 			{	my $sid=selectedIDOfDisplayGroupName($displayGroupName);
-			#	return '' unless length $sid;
 				return ( ($bool eq 'visible') ? '':$block) unless length $sid;
-				$whereClause->{ $dbweb::displayGroups->{$displayGroupName}->{primaryKey} }= $sid;
+				$whereClause->{ $dbweb::displayGroups->{$displayGroupName}->{primaryKey} }= $sid unless $bool =~/empty/o;
 				my $data=getDataForDGN($displayGroupName,{whereClause=>$whereClause, countOnly=>1});
 				if($bool eq 'visible')
-				{	return $block if $data->[0]->[0];
+				{	return $block if $data && $data->[0]->[0];
 				} else
-				{	return $block unless $data->[0]->[0];
+				{	return $block unless $data  && $data->[0]->[0];
 				}
 				return '';
 			} else
