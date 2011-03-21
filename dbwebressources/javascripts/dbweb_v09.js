@@ -56,12 +56,6 @@ DBWeb.prototype = {
 				new ComboBoxAutocompleter(id, this.uri+"?"+this.basicParams()+"&ajax=1&dg="+d['dg']+"&filter="+d['filter']+"&field="+d['field']+"&pk="+d['pk'], props);
 			}
 		}
-		for ( var id in pairs['jsconfig']['watchers'] )
-		{	if( pairs['jsconfig']['watchers'].hasOwnProperty(id) )
-			{	new PeriodicalExecuter(this.ajaxwatcher.bindAsEventListener(this,id), 1);
-			}
-		}
-
 
 		this.cms= new Array();
 		this.datagrids= new Array();
@@ -121,16 +115,24 @@ DBWeb.prototype = {
 		} catch (error){
 		};
 	},
-	ajaxwatcher: function(token)
-	{	var s=this.basicParams()+'&pf='+encodeURIComponent( token );
-		new Ajax.Request(this.uri, { method: 'post', postBody: s, asynchronous: true,
-			onSuccess: function(t)
-					{	var pairs = eval("(" + t.responseText + ")");
-						if(pairs['exists']) this.reloadPage();
-					}.bind(this)
-				});
+	ajaxwatcher: function(token, curry, pe)
+	{
+		if(curry!=this.page_curry) pe.stop();
+		else
+		{
+			var s=this.basicParams()+'&pf='+encodeURIComponent( token );
+			new Ajax.Request(this.uri, { method: 'post', postBody: s, asynchronous: true,
+				onSuccess: function(t)
+						{	var pairs = eval("(" + t.responseText + ")");
+							if(pairs['exists'])
+							{	pe.stop();
+								this.reloadPage();
+							}
+						}.bind(this)
+					});
 
 
+			}
 	},
 	PKFromClass: function(className)
 	{	var pattern = /PK_(.+?)( |$)/;

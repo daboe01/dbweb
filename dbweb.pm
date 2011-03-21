@@ -416,10 +416,17 @@ sub addUserscript { my ($script)=@_;
 	$dbweb::JSConfigs{userscripts}->{$script}='';
 }
 
-sub detach_async { my ($cmd)=@_;
-#	use ModPerl2::Tools;
-#	ModPerl2::Tools::spawn +{survive=>1}, $cmd;
-# <!> gen. wrapperscript in tmp that generates semaphore after $cmd finished
+sub detachAsync { my ($cmd)=@_;
+	my $sem='semaphore_dbweb'.int(rand(1000000));
+	sub efunc{ my ($call, $sem)=@_;
+		my $r='0';
+		ref $cmd eq 'CODE'? eval($cmd->()) : system($cmd);
+		use TempFileNames;
+		writeFile('/tmp/'.$sem);
+	}
+	use ModPerl2::Tools;
+	ModPerl2::Tools::spawn  +{survive=>0}, \&efunc, ($cmd, $sem);
+	addUserscript("new PeriodicalExecuter(dbweb.ajaxwatcher.bind(this,'$sem', dbweb.page_curry), 0.25)");
 }
 
 
@@ -2030,13 +2037,20 @@ sub handler{
 	$dbweb::URI=$dbweb::apache->uri;	 # e.g. /dbweb/hhb
 	$dbweb::handlerName='dbweb';
 	$dbweb::pathAddendum='';
-   ($dbweb::handlerName, $dbweb::pathAddendum)=($1, $2) if($dbweb::URI =~/\/([^\/]+)[\/]*(.*)/o);
+	($dbweb::handlerName, $dbweb::pathAddendum)=($1, $2) if($dbweb::URI =~/\/([^\/]+)[\/]*(.*)/o);
 
 	$dbweb::cgi = Apache2::Request->new($dbweb::apache); 
 	$dbweb::logger = Apache2::ServerUtil->server;
 
 	$dbweb::sessionid=$1 if(decodeCGI('sid')=~/^(.*)/);	#untaint
 
+	my $peekFile= CGIonlyAlphanum('pf');
+	if(length $peekFile)
+	{	my $d= (-e '/tmp/'.$peekFile);
+		$dbweb::apache->content_type('json/html; charset=UTF-8');
+		$dbweb::apache->print( JSON::XS->new->utf8->encode( {exists=>$d} ) );
+		return OK;
+	}
 	my $forcedRedirect=decodeCGI('t');
 	if(length $forcedRedirect)
 	{	$dbweb::currentAjaxState=0;
@@ -2053,13 +2067,7 @@ sub handler{
 		$dbweb::sessionid=undef;
 		activateApplication($dbweb::loginname);
 		return OK;
-	} elsif(my $f= CGIonlyAlphanum('pf'))
-	{	my $d= (-e '/tmp/'.$f);
-		$dbweb::apache->content_type('json/html; charset=UTF-8');
-		$dbweb::apache->print( JSON::XS->new->utf8->encode( {exists=>$d} ) );
-		return OK;
-	}
-	else
+	} else
 	{	if(length $dbweb::sessionid && !-e '/tmp/'. $dbweb::sessionid)
 		{	$dbweb::sessionid=undef;
 			loginerror();
