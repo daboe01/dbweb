@@ -1,4 +1,4 @@
-// DBWeb Glue package 18.9.2008 full-ajax version by dr. boehringer
+//  DBWeb Glue package 18.9.2008 full-ajax version by dr. boehringer
 // todo:
 
 //	make detection of write-collisions work again (old inplace stuff)

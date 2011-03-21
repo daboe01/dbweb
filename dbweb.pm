@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
 # dbweb is a mvc-style database application server as of an apache module
-# created 20.1.05 by dr. boehringer
+# created 20.1.05 by dr. boehringer 
 
 # todo:
 #	load bootstrap HTML from file if appropriate env is set.
