@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
 # dbweb is a mvc-style database application server as of an apache module
-# created 20.1.05 by dr. boehringer 
+# created 20.1.05 by dr. boehringer
 
 # todo:
 #	load bootstrap HTML from file if appropriate env is set.
@@ -35,6 +35,7 @@ use Data::Dumper;
 use DateTime;
 #use DateTime::Format::DBI;
 use POSIX;
+use TempFileNames;			#<!> removing this dependency should be easy, look for readFile and writeFile
 
 # API
 # data access and manipulation
@@ -416,16 +417,15 @@ sub addUserscript { my ($script)=@_;
 	$dbweb::JSConfigs{userscripts}->{$script}='';
 }
 
-sub detachAsync { my ($cmd)=@_;
-	my $sem='semaphore_dbweb'.int(rand(1000000));
-	sub efunc{ my ($call, $sem)=@_;
+sub detachAsync { my ($cmd, $jsCallback)=@_;
+	my $sem='semaphore_dbweb'.int(rand(1000000));	#<!> use session md5 instead! 
+	sub efunc{ my ($call, $sem, $jsCallback)=@_;
 		my $r='0';
 		ref $cmd eq 'CODE'? eval($cmd->()) : system($cmd);
-		use TempFileNames;
-		writeFile('/tmp/'.$sem);
+		writeFile('/tmp/'.$sem, $jsCallback);
 	}
 	use ModPerl2::Tools;
-	ModPerl2::Tools::spawn  +{survive=>0}, \&efunc, ($cmd, $sem);
+	ModPerl2::Tools::spawn  +{survive=>0}, \&efunc, ($cmd, $sem, $jsCallback);
 	addUserscript("new PeriodicalExecuter(dbweb.ajaxwatcher.bind(this,'$sem', dbweb.page_curry), 0.25)");
 }
 
@@ -2048,7 +2048,9 @@ sub handler{
 	if(length $peekFile)
 	{	my $d= (-e '/tmp/'.$peekFile);
 		$dbweb::apache->content_type('json/html; charset=UTF-8');
-		$dbweb::apache->print( JSON::XS->new->utf8->encode( {exists=>$d} ) );
+		my $r= {exists=>$d};
+		$r->{exec}=readFile('/tmp/'.$peekFile) if($d);
+		$dbweb::apache->print( JSON::XS->new->utf8->encode( $r ) );
 		return OK;
 	}
 	my $forcedRedirect=decodeCGI('t');

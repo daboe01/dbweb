@@ -1,6 +1,6 @@
-//  DBWeb Glue package 18.9.2008 full-ajax version by dr. boehringer
+// DBWeb Glue package 18.9.2008 full-ajax version by dr. boehringer
 // todo:
-
+//  get rid of Corner.js-> mod. the CSS instead
 //	make detection of write-collisions work again (old inplace stuff)
 
 DBWeb = Class.create();
@@ -126,7 +126,8 @@ DBWeb.prototype = {
 						{	var pairs = eval("(" + t.responseText + ")");
 							if(pairs['exists'])
 							{	pe.stop();
-								this.reloadPage();
+								if(pairs['exec']) eval(pairs['exec']);
+								else this.reloadPage();
 							}
 						}.bind(this)
 					});
@@ -258,13 +259,16 @@ DBWeb.prototype = {
 		this.submitEnriched(form);
 	},
 	submitEnriched: function(form)
+	{	this.submitEnrichedAsync(form, false);
+	},
+	submitEnrichedAsync: function(form, async)
 	{	this.alertOnLeave=false;
 		this.saveUIData();
 		this.enrichSubmitForm(form);
 
 		new Ajax.Request(this.uri, {
 					method: 'post',
-					asynchronous: false,
+					asynchronous: async,
 					postBody: Form.serialize(form)+'&ajax=7',
 					onSuccess: function(t)
 					{	this.changedForm=null;
@@ -357,7 +361,7 @@ DBWeb.prototype = {
 						this.addHiddenField(form, 'forminfo', formname);
 						document.body.appendChild(form);
 					}
-					this.submitEnriched(form);
+					this.submitEnrichedAsync(form, progress>0);
 				}
 			}
 		}.bind(this), 300);		// give inplace editor some millisecs to propagate his changes before submitting
