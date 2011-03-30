@@ -2,6 +2,10 @@
 	background: white url('combo.gif')
 	no-repeat top right;
 }
+.busy {
+	background: transparent url('loader.gif')
+	no-repeat top right;
+}
 .dbweb_sort_down {
 	background: white url('sort_asc.png')
 	no-repeat top right;
@@ -15,7 +19,7 @@ div.menu {
 	position: absolute;
 	top: 0;
 	left: 0;
-	font-family: verdana;
+	font-family: arial;
 }
 div.menu a {
 	display: block;
@@ -88,15 +92,24 @@ div.autocomplete {	position:absolute;	width:250px;	background-color:white;	b
 	position: relative;
 }
 .datatable {
-	font-size: 75%;
-	border: 1px solid #77bb77;
-	box-shadow: rgba(0,0,0, 0.1) 0px 0px 8px;
-	-moz-box-shadow: rgba(0,0,0, 0.1) 0px 0px 8px;
-	-webkit-box-shadow: rgba(0,0,0, 0.1) 0px 0px 8px;
+	font-family: arial;
+	font-size: 90%;
+	color: #360;
+	-moz-box-shadow: rgba(0,0,0, 0.1) 2px 2px 8px;
+	-webkit-box-shadow: rgba(0,0,0, 0.1) 2px 2px 8px;
+	border: 1px solid #c4ffbe;
 }
 .selectedRow {
-	background-color: #cceecc;
-	border: 1px dotted #630;
+	background: #337733;
+	background: -webkit-gradient(linear, left top, left 25, from(#66aa66), to(#337733));
+	background: -moz-linear-gradient(-45deg, #337733,#559955);
+	-moz-border-radius:4px;
+	border-radius:4px;
+	padding:1px;
+	-webkit-border-radius:4px;
+	color: #ffffff !important;
+	-moz-box-shadow: rgba(0,0,0, 0.2) 2px 2px 4px;
+	-webkit-box-shadow: rgba(0,0,0, 0.2) 2px 2px 4px;
 }
 
 .datatable th {
@@ -114,15 +127,22 @@ div.autocomplete {	position:absolute;	width:250px;	background-color:white;	b
 	color: #ffffff;
 	background-color: #77bb77;
 	background: -webkit-gradient(linear, left top, left 25, from(#77bb77), to(#448844));
-	-moz-box-shadow: rgba(0,0,0, 0.1) 0px 0px 8px;
-	-webkit-box-shadow: rgba(0,0,0, 0.1) 0px 0px 8px;
+	background: -moz-linear-gradient(-45deg, #448844,#77bb77);
+	-moz-box-shadow: rgba(0,0,0, 0.1) 2px 2px 8px;
+	-webkit-box-shadow: rgba(0,0,0, 0.1) 2px 2px 8px;
+	-moz-border-radius-topleft:8px;
+	-moz-border-radius-topright:8px;
+	border-top-left-radius:8px;
+	border-top-right-radius:8px;
+	-webkit-border-top-left-radius:8px;
+	-webkit-border-top-right-radius:8px;
 }
 
 .datatable a {
 	color: #360;
 	text-decoration: none;
-	padding: 0;
-	margin: 0;
+	padding:1px;
+	margin: 0px;
 }
 
 .datatable .insertvar {
@@ -135,14 +155,21 @@ form {
 }
 
 fieldset {
+	font-family: arial;
 	background-color: #c4ffbe;
 	padding: 10px;
-    margin:0px;
+	margin:0px;
 	position: relative;
 	border:none;
 	box-shadow: rgba(0,0,0, 0.1) 0px 0px 8px;
 	-moz-box-shadow: rgba(0,0,0, 0.1) 0px 0px 8px;
 	-webkit-box-shadow: rgba(0,0,0, 0.1) 0px 0px 8px;
+	-moz-border-radius-bottomleft:8px;
+	-moz-border-radius-bottomright:8px;
+	border-bottom-left-radius:8px;
+	border-bottom-right-radius:8px;
+	-webkit-border-bottom-left-radius:8px;
+	-webkit-border-bottom-right-radius:8px;
 }
 .dataform {
 	background-color: #c4ffbe;
@@ -157,6 +184,7 @@ fieldset {
 	border:none;
 }
 .dataform_caption {
+	font-family: arial;
 	padding: 4px;
 	margin-left:1px;
 	margin-right:1px;
@@ -169,6 +197,13 @@ fieldset {
 	-moz-box-shadow: rgba(0,0,0, 0.1) 0px 0px 8px;
 	-webkit-box-shadow: rgba(0,0,0, 0.1) 0px 0px 8px;
 	background: -webkit-gradient(linear, left top, left 25, from(#77bb77), to(#448844));
+	background: -moz-linear-gradient(-45deg, #448844,#77bb77);
+	-moz-border-radius-topleft:8px;
+	-moz-border-radius-topright:8px;
+	border-top-left-radius:8px;
+	border-top-right-radius:8px;
+	-webkit-border-top-left-radius:8px;
+	-webkit-border-top-right-radius:8px;
 }
 
 legend {

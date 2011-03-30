@@ -210,7 +210,7 @@ GridViewPort.prototype = {
 		new Insertion.Before(this.table,"<div id='"+ liveGrid.tableId+"_viewport' style='float:left;'></div>");
 		this.table.previousSibling.appendChild(this.table);
 		this.div = this.table.parentNode;
-		//this.div.style.height = ((this.rowHeight * liveGrid.pageSize)) + "px";	//+8
+
 		this.div.style.height = (this.table.offsetHeight) + "px";
 		this.div.style.width=(liveGrid.tableHeader.getWidth()+(Prototype.Browser.IE?30:16))+ "px";
 		this.div.style.overflow = "hidden";

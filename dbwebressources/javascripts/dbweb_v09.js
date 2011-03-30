@@ -1,6 +1,5 @@
 // DBWeb Glue package 18.9.2008 full-ajax version by dr. boehringer
 // todo:
-//  get rid of Corner.js-> mod. the CSS instead
 //	make detection of write-collisions work again (old inplace stuff)
 
 DBWeb = Class.create();
@@ -74,25 +73,6 @@ DBWeb.prototype = {
 		{	var d=pairs['jsconfig']['contextmenu'][id]; // <!>hasOwnProperty
 			this.cms.push(new Proto.Menu({selector: '.'+d['selector'], className: 'menu desktop',
 				menuItems: eval("(" + d['items'] + ")")}));
-		}
-		if(!Prototype.Browser.IE)
-		{	$$('fieldset').each(function(fs)
-			{	new Corner(fs, {corners:"bottom"});
-			});
-			$$('.dataform').each(function(fs)
-			{	new Corner(fs);
-			});
-			$$('.datatable caption').each(function(fs, i)
-			{	new Corner(fs,{corners:"top"});
-				if(Prototype.Browser.WebKit)
-				{	fs.style.marginRight="-2px";
-				}
-			});
-			$$('.dataform_caption').each(function(fs)
-			{	new Corner(fs,{corners:"top"});
-			});
-			//document.onselectstart=function (e) { e.stop(); return false; }.bindAsEventListener(this);
-
 		}
         Event.observe(window, 'beforeunload', function(e)
 		{	if (this.alertOnLeave)
@@ -344,7 +324,8 @@ DBWeb.prototype = {
 	},
 	submitAction: function(confirmtext, formname, noajax, progress, button)
 	{	if(progress>0)
-		{	var elem= new Element('div');
+		{	this.blockPageUI();
+			var elem= new Element('div');
 			if(!noajax) button.disabled=true;
 			$(button).insert( {after: elem} );
 			new ProgressBar(elem, 100, progress);
@@ -442,6 +423,11 @@ DBWeb.prototype = {
 		} else
 		{	Event.observe(elem, 'change', this.checkOnblur.bindAsEventListener(this,elem));
 		}
+	},
+	blockPageUI: function(evt,elementname,fieldname)
+	{	var blurDiv = document.createElement("div");
+		blurDiv.style.cssText = "position:absolute; top:0; right:0; width:" + screen.width + "px; height:" + screen.height + "px; background-color: #FFFFFF; opacity:0.5; filter:alpha(opacity=50)";
+		document.body.appendChild(blurDiv);
 	},
 	J: function(event)
 	{	var cn=Event.findElement(event,'tr').className;

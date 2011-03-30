@@ -2233,7 +2233,6 @@ sub getJSCode { return <<'__JSEOF__'
 <script src="/dbwebressources/javascripts/contextmenu.js"></script>
 <script src="/dbwebressources/javascripts/livegrid.js"></script>
 <script src="/dbwebressources/javascripts/progress.js"></script>
-<script src="/dbwebressources/javascripts/border.js"></script>
 <script src="/dbwebressources/javascripts/hotkey.js"></script>
 <script src="/dbwebressources/javascripts/dbweb_v09.js"></script>
 __ADDHTML__
