@@ -3,12 +3,12 @@ dbweb: a declarative MVC web framework:
 *****
 
 Introduction
-Desktop-databases are perfect for rapid GUI prototyping. The major advantage is that GUI forms are always at sync with the database --- without any explicit programming. However, many of these products under-perform in heavily concurrent production environments. 
+Desktop-databases are perfect for rapid GUI prototyping: GUI forms are always at sync with the database --- without any explicit programming. However, many of these products under-perform in web production environments. 
 
-<dbweb> is an Apache2-based web framework that provides rapid prototyping as well as robust production out of the box. You can write a fully CRUD-functional web application in HTML syntax only. 
-Additionally, <dbweb> introduces specialized input elements such as ComboBox or DataGrid. These allow for handling very large data-sets as they fetch the data on demand and do not require  data pagination.
+<dbweb> is an Apache2-based web framework that provides rapid prototyping as well as robust production out of the box. You can write a fully CRUD-functional web application (including complex master detail semantics) in HTML-like syntax! 
+Additionally, <dbweb> introduces specialized input elements such as ComboBox or DataGrid. These allow for handling very large data-sets as they fetch the data on demand and do not require data pagination.
 
-All your application code (e.g. invoked from buttons, context menus or by data editing) runs server-side\footnote{Currently, only Perl is supported, future releases may also support (server-side) Javascript}.
+All your application code (e.g. invoked from buttons, context menus or by data editing) runs server-side.
 <dbweb> applications are nevertheless fully interactive and provide  confirm-dialogs or GUI-animation effects for immediate feedback. This is possible through Ajax technology. The Ajax-layer is hidden  to the  application developer by default.
 An object oriented API provides access to the database through a thin object-relational mapper.
 

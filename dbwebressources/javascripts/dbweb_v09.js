@@ -115,6 +115,11 @@ DBWeb.prototype = {
 
 			}
 	},
+	form_autosel: function(form_id)
+	{	setTimeout(function(theE)
+		{	theE.select();
+		}.bind(this,$$('#'+form_id+' input[type="text"]')[0]), 100);
+	},
 	PKFromClass: function(className)
 	{	var pattern = /PK_(.+?)( |$)/;
 		pattern.exec(className);
@@ -136,7 +141,7 @@ DBWeb.prototype = {
 		}
 		return 'sid='+this.sessionid+'&pt='+this.appname+iefix;
 	},
-	_numberOfTextfieldsInForm: function(form)
+	_numberOfTextfieldsInForm: function(form)	//<!>:   $$('#'+form_id+' input[type="text"]').length + $$('#'+form_id+' input[type="text"]').length
 	{	var ret=0;
 		var l=form.elements.length;
 		for(var i=0; i < l; i++)
@@ -362,6 +367,14 @@ DBWeb.prototype = {
 				alert(error.description);
 			};
 		}
+	},
+	raiseDOMID: function (event, id)
+	{	this.submitCTXAction(event, null, null,'select');
+		this.reloadPage();
+		setTimeout(function(event,id){
+			$(id).setStyle({left:Event.pointer(event).x, top: Event.pointer(event).y}).appear({duration:0.15});
+			this.form_autosel(id);
+		}.bind(this,event,id), 300);		// give inplace editor some millisecs to propagate his changes before submitting
 	},
 	saveUIData: function ()
 	{	if(this.focusElement && this.focusElement.form)

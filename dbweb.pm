@@ -1454,7 +1454,7 @@ sub compileContextMenus {
 			{	$i->{$_}="'$i->{$_}'" if exists $i->{$_};
 			}
 			$i->{action}="''" unless exists $i->{action};
-			$i->{javascript}.="dbweb.addHiddenField(\$(#$i->{raiseDOMId}#), #pk#, pk); \$(#$i->{raiseDOMId}#).setStyle({left:Event.pointer(event).x, top: Event.pointer(event).y}).appear({duration:0.15});" if($i->{raiseDOMId});
+			$i->{javascript}.="dbweb.addHiddenField(\$(#$i->{raiseDOMId}#), #pk#, pk);dbweb.raiseDOMID(event, #$i->{raiseDOMId}#)" if($i->{raiseDOMId});
 			$i->{callback}='function(e) {dbweb.submitCTXAction(e,\''.$i->{confirm}.'\',\''.$i->{javascript}.'\','.$i->{action}.',\''.$i->{perlfunc}.'\',\''.$dgn.'\') }';
 			delete $i->{$_} for qw/perlfunc confirm javascript action condition raiseDOMId/;
 			$i;
