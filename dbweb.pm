@@ -1100,11 +1100,12 @@ sub isDGNEmpty { my ($displayGroupName)=@_;
 }
 
 sub handleForm { my ($displayGroupName, $formparams, $block, $primaryKey, $datarow)=@_;
-	my ($reta, $retb, $style, $trail, $plain);
+	my ($reta, $retb, $style, $trail, $plain, $addClass);
 	$retb='<div class="dataform_caption">'.$1.'</div>' if($formparams=~s/label=\"(.*?)\"//ogs);
 	$style=$1  if($formparams=~s/(style=[\"'].*?[\"'])//ogs);
 	$style.=" $1" if($formparams=~s/(id=[\"'].*?[\"'])//ogs);
 	$plain=1 if($formparams=~s/(plain=[\"']{0,1}.*?[\"']{0,1})//ogs);
+	$addClass = "$1 " if($formparams=~s/class=\"([^\"]+)\"//ois);
 
 	my $formName=uniqueFormNameForDGName($displayGroupName);
 	unless(length $primaryKey) {$reta='<fieldset>'.$reta; $trail.='</fieldset>'}	# nicht die forms in tabellen als fieldset markieren
@@ -1117,7 +1118,6 @@ sub handleForm { my ($displayGroupName, $formparams, $block, $primaryKey, $datar
 
 	$block=~s/<cond ([^>]+?)>(.*?)<\/cond>/handleCond($displayGroupName,$1,$2, $datarow)/oeigs if($block=~/<cond/o);
 	my $paramHashR={};
-	my $addClass='';
 	$block=~s/<var:([^>]+?)\b([^>]*edittype=[^>]*)>/expandFormfield($displayGroupName,$formName,$1,$2,$primaryKey, undef, $paramHashR,$datarow,\$addClass)/oegs;
 	$block =~s/<button:(.+?)\b(.*?)>/handleButton($1,$2,$primaryKey,$displayGroupName)/oeigs;
 	$paramHashR->{'u'}='y';
@@ -1454,7 +1454,7 @@ sub compileContextMenus {
 			{	$i->{$_}="'$i->{$_}'" if exists $i->{$_};
 			}
 			$i->{action}="''" unless exists $i->{action};
-			$i->{javascript}.="dbweb.addHiddenField(\$(#$i->{raiseDOMId}#), #pk#, pk);dbweb.raiseDOMID(event, #$i->{raiseDOMId}#)" if($i->{raiseDOMId});
+			$i->{javascript}.="dbweb.raiseDOMID(event, #$i->{raiseDOMId}#)" if($i->{raiseDOMId});
 			$i->{callback}='function(e) {dbweb.submitCTXAction(e,\''.$i->{confirm}.'\',\''.$i->{javascript}.'\','.$i->{action}.',\''.$i->{perlfunc}.'\',\''.$dgn.'\') }';
 			delete $i->{$_} for qw/perlfunc confirm javascript action condition raiseDOMId/;
 			$i;
