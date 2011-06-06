@@ -14,7 +14,8 @@ DBWeb.prototype = {
 		this.userscripts=null;
 		this.alertOnLeave=false;
 		this.page_curry=1;
-
+		this.kbdEvent = (Prototype.Browser.Gecko || Prototype.Browser.Opera) ? "keypress" : "keydown";
+		this.modalPanel=null;
 
 		new Ajax.Request(this.uri, {
 			method: 'post',
@@ -117,7 +118,7 @@ DBWeb.prototype = {
 	},
 	form_autosel: function(form_id)
 	{	setTimeout(function(theE)
-		{	theE.select();
+		{	if(theE) theE.select();
 		}.bind(this,$$('#'+form_id+' input[type="text"]')[0]), 100);
 	},
 	PKFromClass: function(className)
@@ -373,8 +374,23 @@ DBWeb.prototype = {
 		this.reloadPage();
 		setTimeout(function(event,id){
 			$(id).setStyle({left:Event.pointer(event).x, top: Event.pointer(event).y}).appear({duration:0.15});
+			this.modalPanel=id;
+			Event.observe(document, this.kbdEvent, this.kbdObserver);
 			this.form_autosel(id);
 		}.bind(this,event,id), 300);		// give inplace editor some millisecs to propagate his changes before submitting
+	},
+	kbdObserver:function (event)
+	{
+		switch(event.keyCode) {
+			case Event.KEY_ESC:
+			if(dbweb.modalPanel)
+			{
+				$(dbweb.modalPanel).fade({duration:0.15});
+				dbweb.modalPanel=null;
+				Event.stopObserving(document, dbweb.kbdEvent, dbweb.kbdObserver);
+			}
+			break;
+		}
 	},
 	saveUIData: function ()
 	{	if(this.focusElement && this.focusElement.form)

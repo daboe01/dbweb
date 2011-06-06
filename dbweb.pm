@@ -1114,8 +1114,11 @@ sub handleForm { my ($displayGroupName, $formparams, $block, $primaryKey, $datar
 	$primaryKey= selectedIDOfDisplayGroupName($displayGroupName) unless length $primaryKey;
 	my $dg=$dbweb::displayGroups->{$displayGroupName};
 
-	$datarow=getRawDataForDG($dg,{$dg->{primaryKey} => $primaryKey})->[0] unless length $datarow;
-
+	unless (length $datarow)
+	{	my $datarowR=getRawDataForDG($dg,{$dg->{primaryKey} => $primaryKey}) ;
+		$datarow=$datarowR->[0] if $datarowR;
+	}
+		
 	$block=~s/<cond ([^>]+?)>(.*?)<\/cond>/handleCond($displayGroupName,$1,$2, $datarow)/oeigs if($block=~/<cond/o);
 	my $paramHashR={};
 	$block=~s/<var:([^>]+?)\b([^>]*edittype=[^>]*)>/expandFormfield($displayGroupName,$formName,$1,$2,$primaryKey, undef, $paramHashR,$datarow,\$addClass)/oegs;
