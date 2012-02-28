@@ -173,8 +173,8 @@ sub dictsForWhereClauseDictRaw { my ($self,$dict,$opts, $utf8)=@_;
 	return undef;
 }
 
-sub dictForPK { my ($self,$pk)=@_;
-	my $dicts= $self->dictsForWhereClauseDictRaw( { $self->{primaryKey}=>$pk } );
+sub dictForPK { my ($self,$pk,  $utf8)=@_;
+	my $dicts= $self->dictsForWhereClauseDictRaw( { $self->{primaryKey}=>$pk }, undef, $utf8 );
 	return $dicts? $dicts->[0]:undef;
 }
 sub valueOfSelectedField { my ($self, $path)=@_;
@@ -1136,6 +1136,8 @@ sub handleForm { my ($displayGroupName, $formparams, $block, $primaryKey, $datar
 }
 
 sub handleButton { my ($name,$block,$pk, $dgn)=@_;
+	my $class;
+	$class=$1 if $block=~/(class=\".*?\")/o;
 	if($block=~/perl=\"(.*?)\"/o)
 	{	my $d={fn=>$1, buttonname=>$name};
 		my $confirm=($block=~s/confirm=\"(.*?)\"//ogsi)? $1:'';
@@ -1147,9 +1149,9 @@ sub handleButton { my ($name,$block,$pk, $dgn)=@_;
 		return 'javascript:dbweb.submitAction(null,\''.$fi."',".$noajax.')' if $name eq '_Javascript_';
 		return 'dbweb.submitAction(null,\''.$fi."',".$noajax.')' if $name eq '_JavascriptImg_';
 		$name=~s/_/ /og;
-		return '<input type="button" value="'.$name.'" onClick="dbweb.submitAction(\''.$confirm.'\',\''.$fi."',".$noajax.','. $progress.',this)">';
+		return '<input type="button" value="'.$name.'" '.$class.' onClick="dbweb.submitAction(\''.$confirm.'\',\''.$fi."',".$noajax.','. $progress.',this)">';
 	}
-	return '<input type="submit" value="'.$name.'">';
+	return '<input type="submit" '.$class.' value="'.$name.'">';
 }
 
 sub handleCounts { my ($displayGroupName, $field)=@_;
@@ -1319,12 +1321,12 @@ sub handleTable { my ($rawDisplayGroupName, $block)=@_;
 	{	my $sortable= sessionData('defaultsortfilter_'.$displayGroupName);
 		my $up_down=  sessionData('defaultsortupdown_'.$displayGroupName);
 
-		$head='<table id="'. $idname.'_header" class="datatable" style="width:'.$totalWidth.'px; table-layout: fixed;">'. $pref1.'<tr>';
-		$head.='<th onclick="dbweb.sortable('."'$displayGroupName','$_->{name}'".')" style="width:'.$_->{width}.$_->{unit}.';"'.($_->{name} =~ /\b\Q$sortable\E\b/? ('class="dbweb_sort_'.$up_down.'";') :'').'>'.$_->{name}.'</th>' for (@cols);
+		$head='<table id="'. $idname.'_header" class="datatable" style="table-layout: fixed;">'. $pref1.'<tr>';
+		$head.='<th><div class="clp" onclick="dbweb.sortable('."'$displayGroupName','$_->{name}'".')" style="width:'.$_->{width}.$_->{unit}.';"'.($_->{name} =~ /\b\Q$sortable\E\b/? ('class="dbweb_sort_'.$up_down.'";') :'').'>'.$_->{name}.'</div></th>' for (@cols);
 		$head.='</tr></table>';
-		$ret.='<table id="'. $idname.'" class="datatable" style="width:'.$totalWidth.'px;">';
+		$ret.='<table id="'. $idname.'" class="datatable">';
 	}
-
+	
 	my @rowsarr= split /<\/cell>/o, $foreachblockraw; pop @rowsarr;
 	my $i;
 	my $foreachblock='<tr>';
@@ -1332,10 +1334,10 @@ sub handleTable { my ($rawDisplayGroupName, $block)=@_;
 	for  (@rowsarr)
 	{	$_=~s/<cell>//ogs;
 		my $w=$cols[$i++]->{width};
-		$foreachblock.='<td><div style="height:1.3em;width:'.$w.'px;overflow:hidden">'.$_.'</div></td>'
+		$foreachblock.='<td><div class="clp" style="width:'.$w.'px;">'.$_.'</div></td>'
 	};
 	$foreachblock.='</tr>';
-
+	
 	sessionData('ajaxtab_'.$idname, $foreachblock);
 	my $offset=sessionData('row_'.$idname);
 	$offset=(length $offset)? $offset:0;
@@ -1399,6 +1401,7 @@ sub handleForeach { my ($displayGroupName, $foreachblock, $ajaxParams)=@_;
 		my $currblock=$foreachblock;
 		my $pk=$row->[$columnIndexOfPK];
 		$currblock=~s/(<t[rd])[^>]*?>/$1 class="$classname PK_$pk">/ois;	#<!> predefined classes on tr currently unsupported
+		$currblock=~s/<li>/<li class="$classname PK_$pk">/ois;	#crude hack to support twitter bootstrap navigation bar
 		if($plain)
 		{	$currblock=~s/(<var:(.+?)\b([^>]*)>)/$row->[getIndexOfColumnInDG($2,$dg)]/oeigs;
 		} else
@@ -2225,10 +2228,12 @@ __APIEOF__
 }
 # client-side javascript package
 ###################################################################################
-sub getJSCode { return <<'__JSEOF__'
+sub getJSCode {
+return <<'__JSEOF__'
+<!DOCTYPE HTML>
 <html>
 <head>
-<link rel=stylesheet href="/dbwebressources/style.css"/>
+<link rel=stylesheet href="/dbwebressources/style_green.css"/>
 <link rel=stylesheet href="/dbwebressources/__APPRESS__.css"/>
 <script src="/dbwebressources/javascripts/prototype.js"></script>
 <script src="/dbwebressources/javascripts/scriptaculous.js"></script>

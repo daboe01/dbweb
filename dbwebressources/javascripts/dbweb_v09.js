@@ -56,6 +56,13 @@ DBWeb.prototype = {
 				new ComboBoxAutocompleter(id, this.uri+"?"+this.basicParams()+"&ajax=1&dg="+d['dg']+"&filter="+d['filter']+"&field="+d['field']+"&pk="+d['pk'], props);
 			}
 		}
+		$$('.dropdown-toggle').invoke('observe',  'click', function(e){
+			var o=$(e.target).up(1);
+			if(o.hasClassName('open')) o.removeClassName('open');
+			else(o.addClassName('open'));
+			e.stop();
+		}.bind(this));
+
 
 		this.cms= new Array();
 		this.datagrids= new Array();
@@ -373,7 +380,7 @@ DBWeb.prototype = {
 	{	this.submitCTXAction(event, null, null,'select');
 		this.reloadPage();
 		setTimeout(function(event,id){
-			$(id).setStyle({left:Event.pointer(event).x, top: Event.pointer(event).y}).appear({duration:0.15});
+			$(id).setStyle({left:Event.pointer(event).x+'px', top: Event.pointer(event).y+'px'}).appear({duration:0.15});
 			this.modalPanel=id;
 			Event.observe(document, this.kbdEvent, this.kbdObserver);
 			this.form_autosel(id);
@@ -459,9 +466,9 @@ DBWeb.prototype = {
 		document.body.appendChild(blurDiv);
 	},
 	J: function(event)
-	{	var cn=Event.findElement(event,'tr').className;
+	{	var cn=(Event.findElement(event,'tr') || Event.findElement(event,'li')).className;
 		if( cn.indexOf('_')<0)
-			cn=Event.findElement(event,'td').className;
+			cn=(Event.findElement(event,'td')).className;
 		var c=this.URIComponentsFromClass(cn);
 		this.saveAndJumpToLocation(this.uri+"?"+this.basicParams()+"&a=select&"+c, false);
 	},
