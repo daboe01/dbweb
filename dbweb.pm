@@ -1219,6 +1219,8 @@ sub handleCond { my ($displayGroupName, $field, $block, $datarow)=@_;
 	{	return $block if($val gt $1);
 	} elsif ($cond=~/lt:const:([^\"]+)/ois)
 	{	return $block if($val lt $1);
+	} elsif( $cond=~/ne:const:([^\"]+)/ois)
+	{	return $block if($val ne $1);
 	} elsif( $cond=~/(eq:){0,1}const:([^\"]+)/ois)
 	{	return $block if($val eq $2);
 	} elsif($cond=~/nenull/ois)
