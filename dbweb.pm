@@ -1408,7 +1408,8 @@ sub handleForeach { my ($displayGroupName, $foreachblock, $ajaxParams)=@_;
 		{	$currblock=~s/(<var:(.+?)\b([^>]*)>)/$row->[getIndexOfColumnInDG($2,$dg)]/oeigs;
 		} else
 		{	$currblock=~s/<cond ([^>]+?)>(.*?)<\/cond>/handleCond($displayGroupName,$1,$2, $row)/oeigs if($currblock =~/<cond/o);
-			$currblock=~s/(<var:([^>]+?)edittype=([^>]+?)>)/handleForm($displayGroupName,'', $1, $pk,$row)/oeigs if($currblock=~/edittype=/o);
+			$currblock=~s/<var:([^<>]+?)\b([^<>]*?)edittype=plain([^<>]*?)>/$row->[getIndexOfColumnInDG($1,$dg)]/oeigs if($currblock=~/edittype=plain/o);
+			$currblock=~s/(<var:([^>]+?)edittype=([^>]+?)>)/handleForm($displayGroupName,'', $1, $pk,$row)/oeigs  if($currblock=~/edittype=/o);
 			$currblock=~s/(<var:(.+?)\b([^>]*)>)/linkedDataFormfield($displayGroupName,$2,$3,$row->[getIndexOfColumnInDG($2,$dg)],$pk,
 													($pk eq $selectedID)? 'selectedRow':'')/oeigs;
 			$currblock=~s/class=\"([^\"]*)\"/class=\"class$classnameData$row->[$columnIndexOfClass] $1\"/ogs if($classnameData);
@@ -1773,6 +1774,7 @@ sub performDisplayGroupActions {
 		my ($offset,$pagesize,$filter)=(CGIonlyDigits('offset'), CGIonlyDigits('page_size'), CGIonlyAlphanum('filter') );
 ###		warn "offset: ".$offset." length: ".$pagesize." filter: ".$filter;
 		my $data= handleForeach($dgName, $foreachblock, {offset=> $offset, length=>$pagesize, filter=>$filter});
+		eval(getPerlfuncCode('_livegrid_')); $dbweb::logger->log_error(":$@") if(length $@);
 		my @rows=split /<\/tr>/o, $data;
 		@rows= map {$_=~s/^<t[rd](\s*class=\"([^\"]+)\"){0,1}[^>]*?>+\s*//ogs; [$2,$_]} @rows;
 		$dbweb::apache->content_type('text/json; charset=UTF-8');
