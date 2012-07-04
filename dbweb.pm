@@ -1363,7 +1363,9 @@ sub handleTable { my ($rawDisplayGroupName, $block)=@_;
 		my $params={ offset=>$offset, length=>$rows };
 		$params->{filter}=$filterName if($filterName);
 		$pref=handleForeach($rawDisplayGroupName, $foreachblock, $params);
-		return $head.$ret.$pref.'</table>';
+		my $data=$pref;
+		eval(getPerlfuncCode('_livegrid_')); $dbweb::logger->log_error(":$@") if(length $@);
+		return $head.$ret.$data.'</table>';
 	}
 }
 
