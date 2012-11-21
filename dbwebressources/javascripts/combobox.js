@@ -48,6 +48,7 @@ ComboBoxAutocompleter = Class.create(Ajax.Autocompleter,{
 		this.active = false;
 		this.changed=true;
 		this.updateElement(this.getCurrentEntry());
+		if(this.options.onChange) this.options.onChange(this.element);
 	},
 	onObserverEvent: function() {
 		this.changed = false;   

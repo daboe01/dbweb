@@ -51,7 +51,7 @@ DBWeb.prototype = {
 		for ( var id in pairs['jsconfig']['autocomplete'] )
 		{	if( $(id) != null ) // <!>hasOwnProperty
 			{	var d=pairs['jsconfig']['autocomplete'][id];
-				var props={noPulldown:false, visibleHeight:160, paramName: "fieldvalue", frequency:0.05, minChars:2, afterClickElement: function(elem, selection) { dbweb.submitEnriched(elem.form) } };
+				var props={noPulldown:false, visibleHeight:160, paramName: "fieldvalue", frequency:0.05, minChars:2, onChange: function(elem) { dbweb.changedForm=elem.form }, afterClickElement: function(elem, selection) { dbweb.submitEnriched(elem.form) } };
 				if(d['nopulldown']) props.noPulldown=true;
 				new ComboBoxAutocompleter(id, this.uri+"?"+this.basicParams()+"&ajax=1&dg="+d['dg']+"&filter="+d['filter']+"&field="+d['field']+"&pk="+d['pk'], props);
 			}
