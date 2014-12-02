@@ -901,6 +901,7 @@ sub whereClauseForFilterOfDGName { my ($filterName,$displayGroupName)=@_;
 sub lookupDataForPathAndPK { my ($path,$val)=@_;
 	my ( $displayGroupName,$fieldName);
 		($displayGroupName,$fieldName)=($1,$2) if($path=~/(.*?)\.(.*)/o);
+    $fieldName=$1 if $fieldName=~/.+?\.(.+)/o; # remove filter if set (caused combobox issues 2014-12-2 daboe01)
 	return undef unless exists $dbweb::displayGroups->{$displayGroupName};
 	return undef if (!(length $val) && (!(length $dbweb::displayGroups->{$displayGroupName}->{DataInSession})));
 	my $data=getRawDataForDG($dbweb::displayGroups->{$displayGroupName},{$dbweb::displayGroups->{$displayGroupName}->{primaryKey}=>$val});
