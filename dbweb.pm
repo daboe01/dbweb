@@ -1304,7 +1304,7 @@ sub handleTable { my ($rawDisplayGroupName, $block)=@_;
 	my $ret;
 	my $rows=   ($rawDisplayGroupName=~s/\s+rows=\"([^\"]+)\"//ogs)? $1: undef;
     my $cookedDisplayGroupName=$rawDisplayGroupName;
-    $cookedDisplayGroupName=~s/\s+classnameVar=\"([^\"]+)\"//ogs;
+	my $classnameVar= ($cookedDisplayGroupName=~s/\s+classnameVar=\"([^\"]+)\"//ogs)? $1: undef;
 
 	my ($data, $displayGroupName, $filterName)= dataEssentalsTableHeader($cookedDisplayGroupName, {countOnly=>1} );
 	my $realrows=$data->[0]->[0];
@@ -1354,7 +1354,9 @@ sub handleTable { my ($rawDisplayGroupName, $block)=@_;
 		$dbweb::JSConfigs{tables}->{$idname}->{dg}=$displayGroupName;
 		$dbweb::JSConfigs{tables}->{$idname}->{totalrows}= $realrows;
 		$dbweb::JSConfigs{tables}->{$idname}->{rows}=$rows;
-		$dbweb::JSConfigs{tables}->{$idname}->{filter}=  $filterName;
+		$dbweb::JSConfigs{tables}->{$idname}->{filter} = $filterName;
+		$dbweb::JSConfigs{tables}->{$idname}->{classnameVar} = $classnameVar;
+        
 	} else
 	{	$offset=0;
 	}
@@ -1373,9 +1375,9 @@ sub handleTable { my ($rawDisplayGroupName, $block)=@_;
 	}
 }
 
-sub handleForeach { my ($displayGroupName, $foreachblock, $ajaxParams)=@_;
+sub handleForeach { my ($displayGroupName, $foreachblock, $ajaxParams, $classnameData2)=@_;
 	my $perlfunc=($displayGroupName=~s/\s+perl=\"([^\"]+)\"//ogs)?$1: undef;
-	my $classnameData=($displayGroupName=~s/\s+classnameVar=\"([^\"]+)\"//ogs)?$1: undef;
+	my $classnameData=($displayGroupName=~s/\s+classnameVar=\"([^\"]+)\"//ogs)?$1: $classnameData2;
 	my $reorder=($displayGroupName =~s/\s+reorderVar=\"([^\"]+)\"//ogs)?$1: undef;
 	my $plain=($displayGroupName=~s/\s+plain=\"*yes\"*//oigs)?1:0;
 	my $prefixWithID=($displayGroupName=~s/\s+prefixWithId=\"([^\"]+)\"//ogs)?$1:0;
@@ -1777,9 +1779,10 @@ sub performDisplayGroupActions {
 	{	my $idname=decodeCGI('id');
 		my $foreachblock=sessionData('ajaxtab_'.$idname);
 
-		my ($offset,$pagesize,$filter)=(CGIonlyDigits('offset'), CGIonlyDigits('page_size'), CGIonlyAlphanum('filter') );
+		my ($offset,$pagesize,$filter, $classnameVar)=(CGIonlyDigits('offset'), CGIonlyDigits('page_size'), CGIonlyAlphanum('filter'), CGIonlyAlphanum('classnameVar') );
 ###		warn "offset: ".$offset." length: ".$pagesize." filter: ".$filter;
-		my $data= handleForeach($dgName, $foreachblock, {offset=> $offset, length=>$pagesize, filter=>$filter});
+warn "** $classnameVar";
+		my $data= handleForeach($dgName, $foreachblock, {offset=> $offset, length=>$pagesize, filter=>$filter}, $classnameVar);
 		eval(getPerlfuncCode('_livegrid_')); $dbweb::logger->log_error(":$@") if(length $@);
 		my @rows=split /<\/tr>/o, $data;
 		@rows= map {$_=~s/^<t[rd](\s*class=\"([^\"]+)\"){0,1}[^>]*?>+\s*//ogs; [$2,$_]} @rows;

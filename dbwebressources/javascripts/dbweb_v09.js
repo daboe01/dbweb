@@ -72,7 +72,7 @@ DBWeb.prototype = {
 			{	var d=pairs['jsconfig']['tables'][id];
 				var toprow=0;
 				if(this.toprows.get(id) != undefined) toprow=parseInt(this.toprows.get(id));
-				var dg=new LiveGrid(id, parseInt(d['rows']), parseInt(d['totalrows']), this.uri, { prefetchOffset: toprow, onRefreshComplete: this.reregisterDOMWithDBWeb.bind(this), request:this.basicParams()+"&ajax=2&dg="+d['dg']+"&filter="+d['filter']} )
+				var dg=new LiveGrid(id, parseInt(d['rows']), parseInt(d['totalrows']), this.uri, { prefetchOffset: toprow, onRefreshComplete: this.reregisterDOMWithDBWeb.bind(this), request:this.basicParams()+"&ajax=2&dg="+d['dg']+"&filter="+d['filter']+"&classnameVar="+d['classnameVar']} )
 				this.datagrids.push(dg);
 			}
 		}
