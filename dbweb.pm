@@ -1303,7 +1303,10 @@ sub dataEssentalsTableHeader { my ($displayGroupName, $opts)=@_;
 sub handleTable { my ($rawDisplayGroupName, $block)=@_;
 	my $ret;
 	my $rows=   ($rawDisplayGroupName=~s/\s+rows=\"([^\"]+)\"//ogs)? $1: undef;
-	my ($data, $displayGroupName, $filterName)= dataEssentalsTableHeader($rawDisplayGroupName, {countOnly=>1} );
+    my $cookedDisplayGroupName=$rawDisplayGroupName;
+    $cookedDisplayGroupName=~s/\s+classnameVar=\"([^\"]+)\"//ogs;
+
+	my ($data, $displayGroupName, $filterName)= dataEssentalsTableHeader($cookedDisplayGroupName, {countOnly=>1} );
 	my $realrows=$data->[0]->[0];
 
 	my ($pref, $foreachblockraw) = $block =~/^(.*?)<foreach>(.*?)<\/foreach>/os;
