@@ -12,8 +12,4 @@ All your application code (e.g. invoked from buttons, context menus or by data e
 <dbweb> applications are nevertheless fully interactive and provide  confirm-dialogs or GUI-animation effects for immediate feedback. This is possible through Ajax technology. The Ajax-layer is hidden  to the  application developer by default.
 An object oriented API provides access to the database through a thin object-relational mapper.
 
-Overview
-In <dbweb>, the GUI is laid out in HTML between the HTML5  {\tt<html>} and {\tt</html>} tags. You can use your favourite   HTML/CSS techniques for designing the GUI. <dbweb> introduces only a few additional tags (the most common are {\tt <foreach:..>... </foreach>}, {\tt <form:..>...</form>} and {\tt <var:..>}).  These tags always refer to  {\it DisplayGroup}s which connect the GUI to your databases. We discuss DisplayGroups  in chapter \ref{chap:dg}. 
-
-Briefly, a DisplayGroup basically represents a single table/view in the database but additionally keeps track of row selection (a single row is always selected). The selection can be changed interactively by the user through clicking at any row, or programmatically through the API.  DisplayGroups can be connected to other DisplayGroups in master-detail configurations \footnote{\url{http://en.wikipedia.org/wiki/Master-detail}}. Commonly, a DisplayGroup feeds the data row-wise into a HTML table or a more specialized DataGrid view. Data can be edited in the tables or within dedicated forms. By default, all edits are immediately committed when the input element loses focus. All changes are reflected throughout  the GUI without page reloading.
-DisplayGroups can also be enriched with context menus. This context menu appears whenever data from the appropriate DisplayGroup is right-clicked. The context-menu commonly triggers server-side application code (chapter \ref{chap:coding}).
+Manual: https://github.com/daboe01/DbwebDoku/blob/master/manual.pdf?raw=true
